@@ -1,0 +1,76 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="0C244977-9EF7-8238-A85B-CA41BBBA17F6" name="Actividad_Trabajador">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<ordsAlias>relation_12</ordsAlias>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id_trabajador" id="AEA3469C-A517-F8F9-3B44-C58B7454DECD">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="AFDA0A9B-D3F1-1C04-3AC7-B75A2CA50DF7" referredColumn="F98FA2FF-074C-720F-09E2-F6595D4DCC08"/>
+</associations>
+</Column>
+<Column name="id_actividad" id="9FB43085-8A2B-BFA9-68D5-1BA8DFF2D7E8">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="AABA8DBA-E995-BD36-8552-C1CBE81ADD3B" referredColumn="72E57CFB-4C73-923D-D3C4-BD100588858A"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="A4D816D7-433F-FB47-0E83-FFC1B4BCA45C" name="Relation_12_PK">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="AEA3469C-A517-F8F9-3B44-C58B7454DECD"/>
+<colUsage columnID="9FB43085-8A2B-BFA9-68D5-1BA8DFF2D7E8"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="34706D34-1E04-8D4B-630D-CFFE790768ED" name="Relation_12_Trabajador_FK">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<generatorID>7126DB31-026B-F0E4-1EE4-659E976FBC3A</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="AEA3469C-A517-F8F9-3B44-C58B7454DECD"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="918D2EAE-9BC7-CE30-B709-981BEB8867B8" name="Relation_12_Actividad_FK">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<generatorID>7126DB31-026B-F0E4-1EE4-659E976FBC3A</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="9FB43085-8A2B-BFA9-68D5-1BA8DFF2D7E8"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

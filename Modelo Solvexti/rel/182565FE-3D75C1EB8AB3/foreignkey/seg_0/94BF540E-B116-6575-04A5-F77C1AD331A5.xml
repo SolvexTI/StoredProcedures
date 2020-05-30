@@ -1,0 +1,17 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="94BF540E-B116-6575-04A5-F77C1AD331A5" containerWithKeyObject="E8C97512-58A8-7F05-9A8F-05E80AB9110E" localFKIndex="78C6FA60-6B6F-3C4A-1BE4-77CC3FFE4736" name="Modificaciones_Punto_Mejorable_FK">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<generatorID>252B1272-6A41-DD19-2ACD-887B8EB4AB6C</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<referredTableLongName>Punto_Mejorable</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>9EB3C2E1-8C72-F401-F727-6AD5DBEDAC2E</referredTableID>
+<keyObject>74B006B7-66EF-8D8A-0C27-0ACEB0025795</keyObject>
+<referredKeyID>74B006B7-66EF-8D8A-0C27-0ACEB0025795</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>id_punto_mejorable</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

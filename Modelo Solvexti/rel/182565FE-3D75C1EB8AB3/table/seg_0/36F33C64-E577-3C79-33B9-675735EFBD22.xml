@@ -1,0 +1,61 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="36F33C64-E577-3C79-33B9-675735EFBD22" name="Incidente">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<generatorID>57CDD2A1-5D59-1B44-446F-482630E9B829</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id_incidente" id="F1781749-D565-59A5-BEAC-0A3F72781A21">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<generatorID>A54A91CB-46F6-8A4E-2AAF-EFF035AD837F</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementColumn>true</autoIncrementColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="fecha" id="16FBD5FB-A44C-A4BA-4707-D185C8DA326B">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<generatorID>A8BFB9F8-D104-3832-CA3A-3DBD4D164C8E</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="descripcion" id="F8D525F9-D5CA-198B-5B79-B63AFE7C1878">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<generatorID>5D49866D-559D-A918-AE8B-3BFE15003BFB</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>600</dataTypeSize>
+<ownDataTypeParameters>600,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="14636A64-9840-3740-A699-5BE4BF05EAA5" name="Incidente_PK">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<generatorID>12DF2681-EF8E-CB97-C93E-D71F5CC04E3F</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="F1781749-D565-59A5-BEAC-0A3F72781A21"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

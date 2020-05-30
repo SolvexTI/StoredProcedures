@@ -1,0 +1,18 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.InheritanceRelation" name="Hierarchy_2" directorySegmentName="seg_0" id="E1C3291A-35BF-3048-15A3-F00EF3A9EF87">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:51:54 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<engineerTo>
+<item key="182565FE-87B4-5AEB-CD13-3D75C1EB8AB3" value="true"/>
+</engineerTo>
+<identifying>false</identifying>
+<nameOnSource>Super Type</nameOnSource>
+<nameOnTarget>Sub Type</nameOnTarget>
+<optionalSource>true</optionalSource>
+<optionalTarget>true</optionalTarget>
+<sourceEntity>DF0DD9BE-88DD-6530-78B3-47944F32BD04</sourceEntity>
+<targetEntity>96B5837A-952F-6318-09BA-841A8CBF4871</targetEntity>
+<transferable>true</transferable>
+<deleteRule>NO ACTION</deleteRule>
+</Relation>

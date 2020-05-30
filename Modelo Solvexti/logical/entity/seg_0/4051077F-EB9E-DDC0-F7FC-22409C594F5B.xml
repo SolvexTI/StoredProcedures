@@ -1,0 +1,110 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="4051077F-EB9E-DDC0-F7FC-22409C594F5B" name="Contrato">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 16:35:33 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<engineerTo>
+<item key="182565FE-87B4-5AEB-CD13-3D75C1EB8AB3" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="id_contrato" id="2627D93E-2CB1-7222-E4BF-93466B8CB568">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 16:35:41 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<engineerTo>
+<item key="182565FE-87B4-5AEB-CD13-3D75C1EB8AB3" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="fecha_inicio" id="4F299521-885B-2072-D580-70562BA7358A">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 16:35:55 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<engineerTo>
+<item key="182565FE-87B4-5AEB-CD13-3D75C1EB8AB3" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="fecha_termino" id="F73C3664-6C4D-E975-56EF-8A35CDA0CA59">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 16:36:06 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<engineerTo>
+<item key="182565FE-87B4-5AEB-CD13-3D75C1EB8AB3" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="fecha_facturacion" id="885E2093-01AC-3EF9-595C-32223D9D5A65">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 16:45:47 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<engineerTo>
+<item key="182565FE-87B4-5AEB-CD13-3D75C1EB8AB3" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="id_cliente" id="86165473-FD67-968D-2D95-1F3C683D7DBE">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 16:42:41 UTC</createdTime>
+<generatorID>18AA135D-B171-97B1-FD47-312737A354D7</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<engineerTo>
+<item key="182565FE-87B4-5AEB-CD13-3D75C1EB8AB3" value="true"/>
+</engineerTo>
+<referedAttribute>E880828B-29DF-FAA9-E71D-D43758D5AA8B</referedAttribute>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="id_plan" id="0B5731EB-4B7E-8CA5-CF64-8430FB8A58F9">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:10:07 UTC</createdTime>
+<generatorID>016BCB2C-3690-AA5D-9445-BB54236AB832</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<engineerTo>
+<item key="182565FE-87B4-5AEB-CD13-3D75C1EB8AB3" value="true"/>
+</engineerTo>
+<referedAttribute>F0CD3F0E-409C-DF97-E467-9EFC7EF346D3</referedAttribute>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="489CDFC9-2EDB-987D-4E45-690FA1F1FFCB" name="Contrato PK">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 16:35:54 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<engineerTo>
+<item key="182565FE-87B4-5AEB-CD13-3D75C1EB8AB3" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>2627D93E-2CB1-7222-E4BF-93466B8CB568</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

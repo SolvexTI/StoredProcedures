@@ -1,0 +1,17 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="B2FD58EC-C443-F16F-F224-DC4A6201EF71" containerWithKeyObject="376B40CF-1F6D-67B8-B472-4CB4BD96A4CA" localFKIndex="5CBF294C-687E-823E-41DE-34E83106770E" name="Cargo_Extra_Boleta_FK">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<generatorID>F57D48E7-E06C-0406-1F02-B6C32F3A793A</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<referredTableLongName>Boleta</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>7A3259FE-A58A-2EE3-698A-6754305BD39D</referredTableID>
+<keyObject>9505293A-65CF-1BDC-A2E4-8273D5DAC420</keyObject>
+<referredKeyID>9505293A-65CF-1BDC-A2E4-8273D5DAC420</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>id_boleta</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

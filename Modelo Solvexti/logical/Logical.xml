@@ -1,0 +1,7 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<LogicalDesign class="oracle.dbtools.crest.model.design.logical.LogicalDesign" name="Logical" id="771B5A70-A5C2-C87B-5CC8-77AF112F7DEB" mainViewID="AE871C17-4087-22AD-BF8B-CBFA812D6515">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:06:07 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<shouldBeOpen>false</shouldBeOpen>
+</LogicalDesign>

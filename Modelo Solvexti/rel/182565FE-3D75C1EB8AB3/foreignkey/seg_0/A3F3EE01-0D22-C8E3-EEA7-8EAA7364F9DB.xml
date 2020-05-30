@@ -1,0 +1,17 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="A3F3EE01-0D22-C8E3-EEA7-8EAA7364F9DB" containerWithKeyObject="7A3259FE-A58A-2EE3-698A-6754305BD39D" localFKIndex="BE0CB902-1266-65F4-7D55-1AB08BE7F660" name="Boleta_Plan_FK">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<generatorID>2D65F75F-863C-C35C-F26E-36984EBD2BFF</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<referredTableLongName>Plan</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>70CF7FB9-DEEB-6943-5EE5-BEBF850DD6F0</referredTableID>
+<keyObject>AE31BF66-FC98-8894-DD41-12E4A9CFC996</keyObject>
+<referredKeyID>AE31BF66-FC98-8894-DD41-12E4A9CFC996</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>id_plan</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

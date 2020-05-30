@@ -1,0 +1,8 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="Modelo Solvexti" id="FCB27A63-F504-7A27-35A7-A2DFB8EEC90A" version="3.5">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:06:07 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<capitalNames>false</capitalNames>
+<designId>FCB27A63-F504-7A27-35A7-A2DFB8EEC90A</designId>
+</OSDM_Design>

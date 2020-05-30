@@ -1,0 +1,17 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="9587CB54-9008-2351-81F5-402A87E99C95" containerWithKeyObject="B8D9483F-DD2E-9690-5572-94644372DD1F" localFKIndex="4748FAA2-538B-E0A3-9C7D-FBFD3256CB29" name="Actividad_Cliente_FK">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:53:01 UTC</createdTime>
+<generatorID>8C0D919A-ED5F-57BC-DBE2-69DF0E536C57</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<referredTableLongName>Cliente</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>C899866E-1C6E-9A14-71BE-C10AB91F9CAF</referredTableID>
+<keyObject>89B1769A-B228-D0B1-8CD5-116A56906709</keyObject>
+<referredKeyID>89B1769A-B228-D0B1-8CD5-116A56906709</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>id_cliente</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

@@ -1,0 +1,136 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="C899866E-1C6E-9A14-71BE-C10AB91F9CAF" name="Cliente">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:53:01 UTC</createdTime>
+<generatorID>96B5837A-952F-6318-09BA-841A8CBF4871</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id_usuario" id="3780FEE7-A627-BF95-5E06-E9DC4E29570B">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:53:01 UTC</createdTime>
+<generatorID>79F1CC45-6F65-FC9E-BFC4-70D76D87CABA</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementColumn>true</autoIncrementColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="8899BB15-03AD-7D3A-1F48-6E365D1FBFF8" referredColumn="209AC28A-7381-2A7B-93FD-32C1ACB48C78"/>
+</associations>
+</Column>
+<Column name="id_cliente" id="C8193E3F-B837-A0BF-9181-CC416C08729B">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:53:01 UTC</createdTime>
+<generatorID>E880828B-29DF-FAA9-E71D-D43758D5AA8B</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="nombre" id="BBD36854-41E5-FF24-610C-A16B40E9A663">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:53:01 UTC</createdTime>
+<generatorID>4803FBCC-1D49-D15D-4657-A2E8C93BFD7D</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100</dataTypeSize>
+<ownDataTypeParameters>100,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="direccion" id="0F89510A-B503-04B1-0EE4-DD41E4ED5BD3">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:53:01 UTC</createdTime>
+<generatorID>34BBEE3D-B928-9E78-FE3C-8E0BD0A7EA37</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>120</dataTypeSize>
+<ownDataTypeParameters>120,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="rubro" id="421A24E6-1BEA-505A-CFC3-2CD3B6A8B12C">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:53:01 UTC</createdTime>
+<generatorID>A80FC859-4A00-E091-0897-50DC9ECB7040</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100</dataTypeSize>
+<ownDataTypeParameters>100,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="id_profesional" id="310F1B5C-2F6D-F143-2EE3-6911ED1342D8">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:53:01 UTC</createdTime>
+<generatorID>2927A68B-4542-97E7-4F69-AC51208BF175</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="D7EBC194-227B-9922-8C42-4CC63184E824" referredColumn="526A62AA-5743-DF03-B9FC-8002809A8AA9"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="201BDC90-1DC0-AA5B-8586-0A535621333F" name="Cliente_PK">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:53:01 UTC</createdTime>
+<generatorID>34B69C43-4731-6E62-4502-C5ADE86917D4</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="3780FEE7-A627-BF95-5E06-E9DC4E29570B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="89B1769A-B228-D0B1-8CD5-116A56906709" name="Cliente_PKv1">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:53:01 UTC</createdTime>
+<generatorID>9A05AAC9-9F08-FEB9-326E-79C330FBA931</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<indexState>Unique Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="C8193E3F-B837-A0BF-9181-CC416C08729B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="B3EB5E13-6D8A-2770-750C-CFE5CDCC428E" name="Cliente_Usuario_FK">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:53:01 UTC</createdTime>
+<generatorID>E1C3291A-35BF-3048-15A3-F00EF3A9EF87</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="3780FEE7-A627-BF95-5E06-E9DC4E29570B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="4F3AB413-6247-025C-3E4E-EFE6E4BA0D83" name="Cliente_Profesional_FK">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:53:01 UTC</createdTime>
+<generatorID>55C5F59C-D519-49C6-8CE7-E530779F0732</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="310F1B5C-2F6D-F143-2EE3-6911ED1342D8"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

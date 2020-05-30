@@ -1,0 +1,50 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="DE6401F5-0DBA-5F2F-9AE9-E2BEC328EDBE" name="Tipo_Actividad">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:53:01 UTC</createdTime>
+<generatorID>F17D317C-BABF-83C5-B6BF-E0240093BE70</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id_tipo_actividad" id="B3444517-5124-5F92-23C8-E228AD7D9539">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:53:01 UTC</createdTime>
+<generatorID>8B62FD70-6363-16A9-F4FE-06FC8F6CEA88</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementColumn>true</autoIncrementColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="nombre" id="41FB35D2-6660-5744-18A0-279C4FB152CC">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:53:01 UTC</createdTime>
+<generatorID>8CFF4120-6CDB-D1C1-6883-4773BE667A1B</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>80</dataTypeSize>
+<ownDataTypeParameters>80,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="4793E907-44A2-404E-EAAC-07E938EA83EC" name="Tipo_Actividad_PK">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:53:01 UTC</createdTime>
+<generatorID>51BF8308-17D7-A2AB-FC07-4104E1A7CD68</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="B3444517-5124-5F92-23C8-E228AD7D9539"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

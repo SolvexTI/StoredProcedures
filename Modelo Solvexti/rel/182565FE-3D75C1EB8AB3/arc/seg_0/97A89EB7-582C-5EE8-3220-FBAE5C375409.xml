@@ -1,0 +1,13 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKArc class="oracle.dbtools.crest.model.design.relational.FKArc" directorySegmentName="seg_0" id="97A89EB7-582C-5EE8-3220-FBAE5C375409" name="FKArc_1">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:53:01 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<mandatory>false</mandatory>
+<reverseArc>true</reverseArc>
+<table>2D000745-A11D-2420-DCBC-6365AAB0D050</table>
+<fkeys>
+<fkeyID>295EF524-225B-A35F-A1EE-4735081AF43D</fkeyID>
+<fkeyID>8899BB15-03AD-7D3A-1F48-6E365D1FBFF8</fkeyID>
+</fkeys>
+</FKArc>

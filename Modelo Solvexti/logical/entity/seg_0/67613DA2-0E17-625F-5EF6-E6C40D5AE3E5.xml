@@ -1,0 +1,163 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="67613DA2-0E17-625F-5EF6-E6C40D5AE3E5" name="Actividad">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:24:25 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<engineerTo>
+<item key="182565FE-87B4-5AEB-CD13-3D75C1EB8AB3" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="id_actividad" id="E64F3CF5-65C0-0200-BE75-9628C2D55A94">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:24:48 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<engineerTo>
+<item key="182565FE-87B4-5AEB-CD13-3D75C1EB8AB3" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="nombre" id="428058D9-36AC-279A-22B0-24DF346FD437">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:25:17 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<engineerTo>
+<item key="182565FE-87B4-5AEB-CD13-3D75C1EB8AB3" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>100</dataTypeSize>
+<ownDataTypeParameters>100,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="descripcion" id="9372AAB4-E1D3-BA54-5584-54E642223A00">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:25:30 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<engineerTo>
+<item key="182565FE-87B4-5AEB-CD13-3D75C1EB8AB3" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>600</dataTypeSize>
+<ownDataTypeParameters>600,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="estado" id="A76B279F-FF3F-B169-B21B-9B300162A246">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:25:42 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<engineerTo>
+<item key="182565FE-87B4-5AEB-CD13-3D75C1EB8AB3" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT006</logicalDatatype>
+<dataTypeSize>1</dataTypeSize>
+<ownDataTypeParameters>1,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="fecha_inicio" id="5EE37621-A3ED-912E-0622-FDB931BCBCA9">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:26:42 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<engineerTo>
+<item key="182565FE-87B4-5AEB-CD13-3D75C1EB8AB3" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT008</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="resultado" id="CF4D512A-B839-6D86-3BDE-AEED4383BDA2">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:27:11 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<engineerTo>
+<item key="182565FE-87B4-5AEB-CD13-3D75C1EB8AB3" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>600</dataTypeSize>
+<ownDataTypeParameters>600,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="cantidad_modificaciones" id="031FB0D9-883C-9A1F-7D0C-A13D914D3F93">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:27:28 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<engineerTo>
+<item key="182565FE-87B4-5AEB-CD13-3D75C1EB8AB3" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="id_profesional" id="8C42BC0B-F525-B2BA-CD9B-5FDFE0AEA6BE">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:37:15 UTC</createdTime>
+<generatorID>103941B9-204C-DB43-C794-6C8160F3E3B2</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<engineerTo>
+<item key="182565FE-87B4-5AEB-CD13-3D75C1EB8AB3" value="true"/>
+</engineerTo>
+<referedAttribute>C10FCAA6-C9DF-A4D9-57C5-53E01756314D</referedAttribute>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="id_cliente" id="930F76DD-E993-363B-1651-06C315AD08A3">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:39:08 UTC</createdTime>
+<generatorID>8C0D919A-ED5F-57BC-DBE2-69DF0E536C57</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<engineerTo>
+<item key="182565FE-87B4-5AEB-CD13-3D75C1EB8AB3" value="true"/>
+</engineerTo>
+<referedAttribute>E880828B-29DF-FAA9-E71D-D43758D5AA8B</referedAttribute>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="id_tipo_actividad" id="3298029C-5FE8-02CB-C6D2-296F369BFBD1">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:47:26 UTC</createdTime>
+<generatorID>E32CF3DF-8B5B-8FBB-DBD9-07A1325B04E1</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<engineerTo>
+<item key="182565FE-87B4-5AEB-CD13-3D75C1EB8AB3" value="true"/>
+</engineerTo>
+<referedAttribute>8B62FD70-6363-16A9-F4FE-06FC8F6CEA88</referedAttribute>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="0924E9B5-F8F7-EDA3-D88B-31094A42F413" name="Actividad PK">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:25:16 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<engineerTo>
+<item key="182565FE-87B4-5AEB-CD13-3D75C1EB8AB3" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>E64F3CF5-65C0-0200-BE75-9628C2D55A94</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

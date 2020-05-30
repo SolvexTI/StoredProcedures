@@ -1,0 +1,7 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<BusinessInfoDesign class="oracle.dbtools.crest.model.businessinfo.BusinessInfoDesign" name="Business Information" id="BD679F56-74A8-BEEA-DA58-4F1C8B8BFC02">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 15:06:10 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<shouldBeOpen>false</shouldBeOpen>
+</BusinessInfoDesign>

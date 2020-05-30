@@ -1,0 +1,20 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="Relation_12" directorySegmentName="seg_0" id="7126DB31-026B-F0E4-1EE4-659E976FBC3A">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 16:17:53 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<engineerTo>
+<item key="182565FE-87B4-5AEB-CD13-3D75C1EB8AB3" value="true"/>
+</engineerTo>
+<identifying>false</identifying>
+<nameOnSource>Asiste</nameOnSource>
+<nameOnTarget>Participan</nameOnTarget>
+<optionalSource>true</optionalSource>
+<optionalTarget>false</optionalTarget>
+<sourceCardinality>*</sourceCardinality>
+<sourceEntity>522AF9AB-B061-42DD-BBBB-315AAF2D2522</sourceEntity>
+<targetCardinalityString>*</targetCardinalityString>
+<targetEntity>67613DA2-0E17-625F-5EF6-E6C40D5AE3E5</targetEntity>
+<transferable>true</transferable>
+<deleteRule>NO ACTION</deleteRule>
+</Relation>

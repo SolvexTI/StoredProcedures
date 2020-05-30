@@ -1,0 +1,135 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="7A3259FE-A58A-2EE3-698A-6754305BD39D" name="Boleta">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<generatorID>28717A7D-ADBE-F447-50B6-4232D5585C60</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id_boleta" id="48CCAD18-2E72-17A1-40F8-91403AF007E8">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<generatorID>E7CAB6F8-524D-7A50-5B22-A1BB0BF69973</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementColumn>true</autoIncrementColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="valor" id="8FD7D744-AD98-7EC1-2665-40FFCA5E6734">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<generatorID>C747C3E4-00CE-10DB-5A5F-F71FF226C2F7</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="medio_pago" id="01C8AC0E-ABA3-C5C6-5EE3-103EFFAE7245">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<generatorID>1AB3981C-B171-BD60-DCBE-895D78D548A5</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>200</dataTypeSize>
+<ownDataTypeParameters>200,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="fecha_pago" id="C0DC3588-5C7B-1631-56AD-21AE51C23C06">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<generatorID>0F8DBE53-F5B6-6F25-C70C-52D5C178542C</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="id_cliente" id="79566A0C-0499-5438-1D82-4453A1EF9801">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<generatorID>C135A739-1750-50A3-494C-42CD8AFC8929</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="47C088E2-54D6-6E54-0F1D-0A3D20467E18" referredColumn="C8193E3F-B837-A0BF-9181-CC416C08729B"/>
+</associations>
+</Column>
+<Column name="id_plan" id="5A29F32C-C304-81EA-2134-7516E8D35A6E">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<generatorID>197E9463-0DFB-9321-3676-C21B1B3A3FD2</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="A3F3EE01-0D22-C8E3-EEA7-8EAA7364F9DB" referredColumn="1BE4F9FF-5497-7C35-5F88-5E16B8B7D5ED"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="9505293A-65CF-1BDC-A2E4-8273D5DAC420" name="Boleta_PK">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<generatorID>5A407016-C574-8653-ED9A-0CF7ED62220E</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="48CCAD18-2E72-17A1-40F8-91403AF007E8"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="99D26551-10E6-F084-0198-FC91BF27ECB8" name="Boleta__IDX">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<relationGeneratorID>2D65F75F-863C-C35C-F26E-36984EBD2BFF</relationGeneratorID>
+<indexColumnUsage>
+<colUsage columnID="5A29F32C-C304-81EA-2134-7516E8D35A6E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="522C1D8F-2D05-7E4A-2C99-A1B37A370C4F" name="Boleta_Cliente_FK">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<generatorID>39F0044C-80CC-AD0E-D8E3-D880C199D69F</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="79566A0C-0499-5438-1D82-4453A1EF9801"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="BE0CB902-1266-65F4-7D55-1AB08BE7F660" name="Boleta_Plan_FK">
+<createdBy>Alejandro</createdBy>
+<createdTime>2020-05-22 20:23:24 UTC</createdTime>
+<generatorID>2D65F75F-863C-C35C-F26E-36984EBD2BFF</generatorID>
+<ownerDesignName>Modelo Solvexti</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="5A29F32C-C304-81EA-2134-7516E8D35A6E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

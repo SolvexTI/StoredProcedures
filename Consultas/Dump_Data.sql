@@ -8,6 +8,8 @@
    1.1.1-1.1    02/06/2020     Alejandro Del Pino       			1. Insercion datos tablas
 
 ***************************************************************************************************************/
+DELETE PROFESIONAL WHERE 1 = 1;
+DELETE CLIENTE WHERE 1 = 1;
 DELETE USUARIO WHERE 1 = 1;
 DELETE ROL WHERE 1 = 1;
 

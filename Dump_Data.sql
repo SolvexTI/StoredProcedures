@@ -1,13 +1,15 @@
 /**************************************************************************************************************
    NAME:        DUMP_DATA
-   PURPOSE		Ingreso de datos para pruebas del sistema
+   PURPOSE		Ingreso de datos para pruebas del sistema 
 
    REVISIONS:
    Ver          Date           Author                               Description
    ---------    ----------     -------------------                  ----------------------------------------------
    1.1.1-1.1    02/06/2020     Alejandro Del Pino       			1. Insercion datos tablas
-
+   
 ***************************************************************************************************************/
+DELETE PROFESIONAL WHERE 1 = 1;
+DELETE CLIENTE WHERE 1 = 1;
 DELETE USUARIO WHERE 1 = 1;
 DELETE ROL WHERE 1 = 1;
 
@@ -32,3 +34,6 @@ INSERT INTO PROFESIONAL VALUES (2, ID_PROFESIONAL_SEQ.NEXTVAL, 'CARLA', 'DEL PIN
 /************************************INSERSION TABLA CLIENTE*******************************************************/
 
 INSERT INTO CLIENTE VALUES (3, ID_CLIENTE_SEQ.NEXTVAL, 'DUOC UC', 'ANTONIO VARAS #666', 'EDUCACION', 1);
+
+
+

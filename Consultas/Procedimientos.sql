@@ -45,7 +45,6 @@ CREATE OR REPLACE PROCEDURE pr_insertar_profesional (
   p_password in usuario.password%TYPE,
   p_telefono in usuario.telefono%TYPE,
   p_correo in usuario.correo%TYPE,
-  p_id_rol in usuario.id_rol%TYPE,
   p_nombre in profesional.nombre%TYPE,
   p_apellido_paterno in profesional.apellido_paterno%TYPE,
   p_apellido_materno in profesional.apellido_materno%TYPE,
@@ -68,7 +67,7 @@ AS
 BEGIN
 
   INSERT INTO usuario (id_usuario,username, password, telefono, correo, id_rol)
-  values(id_usuario_seq.NEXTVAL, p_username, p_password, p_telefono, p_correo, p_id_rol);
+  values(id_usuario_seq.NEXTVAL, p_username, p_password, p_telefono, p_correo, 2);
 
   INSERT INTO profesional (id_usuario, id_profesional, nombre, apellido_paterno, apellido_materno, rut, dv)
   VALUES(id_usuario_seq.CURRVAL, id_profesional_seq.NEXTVAL, p_nombre, p_apellido_paterno, p_apellido_materno, p_rut, p_dv);

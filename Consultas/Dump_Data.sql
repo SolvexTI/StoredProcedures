@@ -29,7 +29,7 @@ INSERT INTO USUARIO VALUES(ID_USUARIO_SEQ.NEXTVAL, 'ES.DELPINO', 'ES.DELPINO', '
 
 /************************************INSERSION TABLA PROFESIONAL***************************************************/
 
-INSERT INTO PROFESIONAL VALUES (2, ID_PROFESIONAL_SEQ.NEXTVAL, 'CARLA', 'DEL PINO', 'ACEVEDO', 19952352,'K');
+INSERT INTO PROFESIONAL VALUES (1, ID_PROFESIONAL_SEQ.NEXTVAL, 'CARLA', 'DEL PINO', 'ACEVEDO', 19952352,'K');
 
 /************************************INSERSION TABLA CLIENTE*******************************************************/
 

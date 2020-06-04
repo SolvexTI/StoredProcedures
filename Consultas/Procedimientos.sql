@@ -52,6 +52,7 @@ CREATE OR REPLACE PROCEDURE pr_insertar_profesional (
   p_profesional out tp_profesional
 )
 AS
+ v_profesional tp_profesional;
 /**************************************************************************************************************
    NAME:       	SP_NOMBRE_PROCEDIMIENTO
    PURPOSE		ACCION QUE REALIZA EL PROCEDURE
@@ -66,13 +67,22 @@ AS
 BEGIN
 
   INSERT INTO usuario (id_usuario,username, password, telefono, correo, id_rol)
-  values(id_usuario_seq.NEXTVAL, p_username, p_password, p_telefono, p_correo, 2);
+  VALUES(id_usuario_seq.NEXTVAL, p_username, p_password, p_telefono, p_correo, 2);
 
   INSERT INTO profesional (id_usuario, id_profesional, nombre, apellido_paterno, apellido_materno, rut, dv)
   VALUES(id_usuario_seq.CURRVAL, id_profesional_seq.NEXTVAL, p_nombre, p_apellido_paterno, p_apellido_materno, p_rut, p_dv);
 
-  p_profesional := fn_obtener_profesional(id_usuario_seq.CURRVAL);
-
+  v_profesional.id_usuario := id_usuario_seq.CURRVAL;
+  v_profesional.username := p_username;
+  v_profesional.password := p_password;
+  v_profesional.telefono := p_telefono;
+  v_profesional.correo := p_correo;
+  v_profesional.id_profesional :=  id_profesional_seq.CURRVAL;
+  v_profesional.nombre := p_nombre;
+  v_profesional.apellido_paterno := p_apellido_paterno;
+  v_profesional.apellido_materno := p_apellido_materno;
+  v_profesional.rut := p_rut;
+  v_profesional.dv := p_dv;
 END;
 /
 
@@ -118,12 +128,13 @@ END;
 /
 CREATE OR REPLACE FUNCTION fn_obtener_profesional ( p_id_usuario in usuario.id_usuario%TYPE) RETURN tp_profesional
 AS
-    v_profesional tp_profesional;
+    v_profesional tp_profesional := tp_profesional();
+    str VARCHAR2(300);
 BEGIN
-  SELECT id_usuario,username,password,telefono,correo,id_profesional,nombre,apellido_paterno,apellido_materno,rut,dv
-  INTO v_profesional.id_usuario,v_profesional.username,v_profesional.password,v_profesional.telefono,v_profesional.correo,v_profesional.id_profesional,v_profesional.nombre,v_profesional.apellido_paterno,v_profesional.apellido_materno,v_profesional.rut,v_profesional.dv
-  from USUARIO u join PROFESIONAL p using (id_usuario)
-  WHERE id_usuario = p_id_usuario;
+  str := 'SELECT id_usuario,username,password,telefono,correo,id_profesional,nombre,apellido_paterno,apellido_materno,rut,dv
+  FROM USUARIO u join PROFESIONAL p using (id_usuario)
+  WHERE id_usuario = :p_id_usuario';
+  EXECUTE immediate str bulk collect INTO v_profesional USING P_ID_USUARIO;
   RETURN v_profesional;
 END;
 /

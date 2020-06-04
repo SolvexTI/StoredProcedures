@@ -30,7 +30,6 @@ CREATE OR REPLACE TYPE tp_profesional as object(
   password   VARCHAR2(40),
   telefono   VARCHAR2(12),
   correo     VARCHAR2(80),
-  id_rol     NUMBER(38),
   id_profesional   NUMBER(38),
   nombre           VARCHAR2(120),
   apellido_paterno VARCHAR2(80),
@@ -121,8 +120,8 @@ CREATE OR REPLACE FUNCTION fn_obtener_profesional ( p_id_usuario in usuario.id_u
 AS
     v_profesional tp_profesional;
 BEGIN
-  SELECT id_usuario,username,password,telefono,correo,id_rol,id_profesional,nombre,apellido_paterno,apellido_materno,rut,dv
-  INTO v_profesional.id_usuario,v_profesional.username,v_profesional.password,v_profesional.telefono,v_profesional.correo,v_profesional.id_rol,v_profesional.id_profesional,v_profesional.nombre,v_profesional.apellido_paterno,v_profesional.apellido_materno,v_profesional.rut,v_profesional.dv
+  SELECT id_usuario,username,password,telefono,correo,id_profesional,nombre,apellido_paterno,apellido_materno,rut,dv
+  INTO v_profesional.id_usuario,v_profesional.username,v_profesional.password,v_profesional.telefono,v_profesional.correo,v_profesional.id_profesional,v_profesional.nombre,v_profesional.apellido_paterno,v_profesional.apellido_materno,v_profesional.rut,v_profesional.dv
   from USUARIO u join PROFESIONAL p using (id_usuario)
   WHERE id_usuario = p_id_usuario;
   RETURN v_profesional;

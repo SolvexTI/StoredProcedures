@@ -153,5 +153,153 @@ CREATE OR REPLACE PACKAGE BODY pkg_cliente AS
     DELETE usuario WHERE id_usuario = p_id_usuario;
   END;
 
-END;
+END pkg_cliente;
+/
+
+CREATE  OR REPLACE PACKAGE pkg_actividad AS
+
+  TYPE tp_actividad IS RECORD (
+    id_actividad            NUMBER(38),
+    nombre                  VARCHAR2(100),
+    descripcion             VARCHAR2(600),
+    estado                  CHAR(1),
+    fecha_inicio            DATE,
+    resultado               VARCHAR2(600),
+    cantidad_modificaciones NUMBER(38),
+    id_profesional          NUMBER(38),
+    id_cliente              NUMBER(38),
+    tipo_actividad          VARCHAR2(80)
+
+  );
+
+  TYPE tb_actividad IS TABLE OF tp_actividad;
+
+  FUNCTION fn_obtener_actividad(p_id_actividad actividad.id_actividad%TYPE) RETURN tp_actividad;
+  FUNCTION fn_obtener_actividad_profesional(p_id_profesional profesional.id_profesional%TYPE) RETURN tb_actividad;
+  FUNCTION fn_obtener_actividad_cliente(p_id_cliente cliente.id_cliente%TYPE) RETURN tb_actividad;
+  PROCEDURE pr_insertar_actividad (
+    p_nombre in actividad.nombre%type,
+    p_descripcion in actividad.descripcion%type,
+    p_estado in actividad.estado%type,
+    p_fecha_inicio in actividad.fecha_inicio%type,
+    p_resultado in actividad.resultado%type,
+    p_cantidad_modificaciones in actividad.cantidad_modificaciones%type,
+    p_id_profesional in actividad.id_profesional%type,
+    p_id_cliente in actividad.id_cliente%type,
+    p_tipo_actividad in tipo_actividad.nombre%type,
+    p_actividad out tp_actividad
+  );
+  PROCEDURE pr_eliminar_actividad(p_id_actividad actividad.id_actividad%TYPE);
+  PROCEDURE pr_modificar_actividad(p_actividad in out tp_actividad);
+
+END pkg_actividad;
+/
+
+CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
+  FUNCTION fn_obtener_actividad(p_id_actividad actividad.id_actividad%TYPE) RETURN tp_actividad AS
+    r_actividad tp_actividad;
+  BEGIN
+    SELECT id_actividad,a.nombre,descripcion,estado,fecha_inicio,resultado,cantidad_modificaciones,id_profesional,id_cliente,ta.nombre tipo_actividad
+    INTO r_actividad.id_actividad,r_actividad.nombre,r_actividad.descripcion,r_actividad.estado,r_actividad.fecha_inicio,r_actividad.resultado,r_actividad.cantidad_modificaciones,r_actividad.id_profesional,r_actividad.id_cliente,r_actividad.tipo_actividad
+    FROM actividad a join tipo_actividad ta USING(id_tipo_actividad)
+    WHERE id_actividad = p_id_actividad;
+    RETURN r_actividad;
+  END;
+
+  FUNCTION fn_obtener_actividad_profesional(p_id_profesional profesional.id_profesional%TYPE) RETURN tb_actividad AS
+
+    CURSOR act_cursor  IS
+    SELECT id_actividad,a.nombre,descripcion,estado,fecha_inicio,resultado,cantidad_modificaciones,id_profesional,id_cliente,ta.nombre
+    FROM actividad a join tipo_actividad ta USING(id_tipo_actividad)
+    WHERE id_profesional = p_id_profesional;
+
+    r_actividad tb_actividad;
+  BEGIN
+    OPEN act_cursor;
+      LOOP
+          FETCH act_cursor BULK COLLECT INTO r_actividad;
+          EXIT WHEN act_cursor%NOTFOUND;
+      END LOOP;
+
+    RETURN r_actividad;
+  END;
+
+  FUNCTION fn_obtener_actividad_cliente(p_id_cliente cliente.id_cliente%TYPE) RETURN tb_actividad AS
+
+    CURSOR act_cursor  IS
+    SELECT id_actividad,a.nombre,descripcion,estado,fecha_inicio,resultado,cantidad_modificaciones,id_profesional,id_cliente,ta.nombre
+    FROM actividad a join tipo_actividad ta USING(id_tipo_actividad)
+    WHERE id_cliente = p_id_cliente;
+
+    r_actividad tb_actividad;
+  BEGIN
+    OPEN act_cursor;
+      LOOP
+          FETCH act_cursor BULK COLLECT INTO r_actividad;
+          EXIT WHEN act_cursor%NOTFOUND;
+      END LOOP;
+
+    RETURN r_actividad;
+  END;
+
+  PROCEDURE pr_insertar_actividad (
+    p_nombre in actividad.nombre%type,
+    p_descripcion in actividad.descripcion%type,
+    p_estado in actividad.estado%type,
+    p_fecha_inicio in actividad.fecha_inicio%type,
+    p_resultado in actividad.resultado%type,
+    p_cantidad_modificaciones in actividad.cantidad_modificaciones%type,
+    p_id_profesional in actividad.id_profesional%type,
+    p_id_cliente in actividad.id_cliente%type,
+    p_tipo_actividad in tipo_actividad.nombre%type,
+    p_actividad out tp_actividad)
+  AS
+    v_id_tipo_actividad tipo_actividad.id_tipo_actividad%TYPE;
+  BEGIN
+    SELECT id_tipo_actividad INTO v_id_tipo_actividad FROM tipo_actividad WHERE nombre LIKE p_tipo_actividad;
+    INSERT INTO actividad (id_actividad,
+                           nombre,
+                           descripcion,
+                           estado,
+                           fecha_inicio,
+                           resultado,
+                           cantidad_modificaciones,
+                           id_profesional,
+                           id_cliente,
+                           id_tipo_actividad)
+                    VALUES(id_actividad_seq.NEXTVAL,
+                           p_nombre,
+                           p_descripcion,
+                           p_estado,
+                           p_fecha_inicio,
+                           p_resultado,
+                           p_cantidad_modificaciones,
+                           p_id_profesional,
+                           p_id_cliente,
+                           v_id_tipo_actividad);
+    p_actividad := fn_obtener_actividad(id_actividad_seq.CURRVAL);
+  END;
+
+  PROCEDURE pr_eliminar_actividad(p_id_actividad actividad.id_actividad%TYPE) AS
+  BEGIN
+    DELETE actividad WHERE id_actividad = p_id_actividad;
+  END;
+
+  PROCEDURE pr_modificar_actividad(p_actividad in out tp_actividad) AS
+    v_id_tipo_actividad tipo_actividad.id_tipo_actividad%TYPE;
+  BEGIN
+    SELECT id_tipo_actividad INTO v_id_tipo_actividad FROM tipo_actividad WHERE nombre LIKE p_actividad.tipo_actividad;
+    UPDATE actividad
+    SET nombre = p_actividad.nombre,
+        descripcion = p_actividad.descripcion,
+        estado = p_actividad.estado,
+        fecha_inicio = p_actividad.fecha_inicio,
+        resultado = p_actividad.resultado,
+        cantidad_modificaciones = p_actividad.cantidad_modificaciones,
+        id_profesional = p_actividad.id_profesional,
+        id_cliente = p_actividad.id_cliente,
+        id_tipo_actividad = v_id_tipo_actividad
+    WHERE id_actividad = p_actividad.id_actividad;
+  END;
+END pkg_actividad;
 /

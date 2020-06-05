@@ -252,11 +252,12 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
     p_id_profesional in actividad.id_profesional%type,
     p_id_cliente in actividad.id_cliente%type,
     p_tipo_actividad in tipo_actividad.nombre%type,
-    p_actividad out tp_actividad)
+    p_actividad out tp_actividad
+  )
   AS
     v_id_tipo_actividad tipo_actividad.id_tipo_actividad%TYPE;
   BEGIN
-    SELECT id_tipo_actividad INTO v_id_tipo_actividad FROM tipo_actividad WHERE nombre LIKE p_tipo_actividad;
+    SELECT id_tipo_actividad INTO v_id_tipo_actividad FROM tipo_actividad WHERE UPPER(nombre) LIKE UPPER(p_tipo_actividad);
     INSERT INTO actividad (id_actividad,
                            nombre,
                            descripcion,

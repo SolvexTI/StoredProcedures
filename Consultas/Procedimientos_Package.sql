@@ -347,8 +347,8 @@ CREATE OR REPLACE PACKAGE pkg_punto_mejorable AS
 
   TYPE tb_punto_mejorable IS TABLE OF tp_punto_mejorable;
 
-  PROCEDURE pr_obtener_punto_mejorable(p_id_punto_mejorable punto_mejorable.id_punto_mejorable%TYPE) RETURN tp_punto_mejorable;
-  PROCEDURE pr_obtener_punto_mejorable_activadad(p_id_actividad actividad.id_actividad%TYPE) RETURN tb_punto_mejorable;
+  PROCEDURE pr_obtener_punto_mejorable(p_id_punto_mejorable punto_mejorable.id_punto_mejorable%TYPE, p_punto_mejorable OUT tp_punto_mejorable);
+  PROCEDURE pr_obtener_punto_mejorable_activadad(p_id_actividad actividad.id_actividad%TYPE, p_punto_mejorable OUT tb_punto_mejorable);
   PROCEDURE pr_insertar_punto_mejorable (
     p_titulo IN punto_mejorable.titulo%TYPE,
     p_descripcion IN punto_mejorable.descripcion%TYPE,
@@ -366,25 +366,22 @@ END pkg_punto_mejorable;
 
 CREATE OR REPLACE PACKAGE BODY pkg_punto_mejorable AS
 
-  PROCEDURE pr_obtener_punto_mejorable(p_id_punto_mejorable punto_mejorable.id_punto_mejorable%TYPE) RETURN tp_punto_mejorable AS
-    p_punto_mejorable tp_punto_mejorable;
+  PROCEDURE pr_obtener_punto_mejorable(p_id_punto_mejorable punto_mejorable.id_punto_mejorable%TYPE, p_punto_mejorable OUT tp_punto_mejorable) AS
+
   BEGIN
     SELECT id_punto_mejorable,titulo,descripcion,cumplido,resultado,id_actividad
     INTO p_punto_mejorable.id_punto_mejorable, p_punto_mejorable.titulo, p_punto_mejorable.descripcion, p_punto_mejorable.cumplido, p_punto_mejorable.resultado, p_punto_mejorable.id_actividad
     FROM punto_mejorable
     WHERE id_punto_mejorable = p_id_punto_mejorable;
-
-    RETURN p_punto_mejorable;
   END;
 
-  PROCEDURE pr_obtener_punto_mejorable_activadad(p_id_actividad actividad.id_actividad%TYPE) RETURN tb_punto_mejorable AS
+  PROCEDURE pr_obtener_punto_mejorable_activadad(p_id_actividad actividad.id_actividad%TYPE, p_punto_mejorable OUT tb_punto_mejorable) AS
 
     CURSOR act_cursor  IS
     SELECT id_punto_mejorable,titulo,descripcion,cumplido,resultado,id_actividad
     FROM punto_mejorable
     WHERE id_actividad = p_id_actividad;
 
-    p_punto_mejorable tb_punto_mejorable;
   BEGIN
     OPEN act_cursor;
       LOOP
@@ -392,7 +389,6 @@ CREATE OR REPLACE PACKAGE BODY pkg_punto_mejorable AS
           EXIT WHEN act_cursor%NOTFOUND;
       END LOOP;
 
-    RETURN p_punto_mejorable;
   END;
 
   PROCEDURE pr_insertar_punto_mejorable (
@@ -407,7 +403,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_punto_mejorable AS
     INSERT INTO punto_mejorable (id_punto_mejorable,titulo,descripcion,cumplido,resultado,id_actividad)
     VALUES ( id_punto_mejorable_seq.NEXTVAL,p_titulo,p_descripcion,p_cumplido,p_resultado,p_id_actividad);
 
-    p_punto_mejorable := pr_obtener_punto_mejorable(id_punto_mejorable_seq.CURRVAL);
+    pr_obtener_punto_mejorable(id_punto_mejorable_seq.CURRVAL, p_punto_mejorable);
 
   END;
 
@@ -443,8 +439,8 @@ CREATE OR REPLACE PACKAGE pkg_plan AS
 
   TYPE tb_plan IS TABLE OF tp_plan;
 
-  PROCEDURE pr_obtener_plan(p_id_plan plan.id_plan%TYPE) RETURN tp_plan;
-  PROCEDURE pr_obtener_planes RETURN tb_plan;
+  PROCEDURE pr_obtener_plan(p_id_plan plan.id_plan%TYPE, p_plan OUT tp_plan);
+  PROCEDURE pr_obtener_planes ( p_plan OUT tb_plan);
   PROCEDURE pr_insertar_plan (p_plan IN OUT tp_plan);
   PROCEDURE pr_eliminar_plan (p_id_plan plan.id_plan%TYPE);
   PROCEDURE pr_modificar_plan (p_plan IN OUT tp_plan);
@@ -453,8 +449,7 @@ END pkg_plan;
 /
 
 CREATE OR REPLACE PACKAGE BODY pkg_plan AS
-  PROCEDURE pr_obtener_plan(p_id_plan plan.id_plan%TYPE) RETURN tp_plan AS
-    p_plan tp_plan;
+  PROCEDURE pr_obtener_plan(p_id_plan plan.id_plan%TYPE,  p_plan OUT tp_plan)  AS
   BEGIN
     SELECT id_plan,valor,descripcion
     INTO p_plan.id_plan,p_plan.valor,p_plan.descripcion
@@ -462,18 +457,16 @@ CREATE OR REPLACE PACKAGE BODY pkg_plan AS
     WHERE id_plan = p_id_plan;
   END;
 
-  PROCEDURE pr_obtener_planes RETURN tb_plan AS
+  PROCEDURE pr_obtener_planes ( p_plan OUT tb_plan) AS
     CURSOR plan_cursor  IS
     SELECT id_plan,valor,descripcion
     FROM plan;
-    p_plan tb_plan;
   BEGIN
     OPEN plan_cursor;
       LOOP
           FETCH plan_cursor BULK COLLECT INTO p_plan;
           EXIT WHEN plan_cursor%NOTFOUND;
       END LOOP;
-    RETURN p_plan;
   END;
 
 
@@ -513,7 +506,7 @@ CREATE OR REPLACE PACKAGE pkg_contrato AS
 
   TYPE tb_contrato IS TABLE OF tp_contrato;
 
-  PROCEDURE pr_obtener_contrato(p_id_cliente cliente.id_usuario%TYPE) RETURN tp_contrato;
+  PROCEDURE pr_obtener_contrato(p_id_cliente cliente.id_usuario%TYPE,p_contrato OUT tp_contrato);
   PROCEDURE pr_insertar_contrato(p_contrato IN OUT tp_contrato);
   PROCEDURE pr_eliminar_contrato(p_id_cliente cliente.id_usuario%TYPE);
   PROCEDURE pr_modificar_contrato(p_contrato IN OUT tp_contrato);
@@ -521,14 +514,12 @@ END pkg_contrato;
 /
 CREATE OR REPLACE PACKAGE BODY pkg_contrato AS
 
-  PROCEDURE pr_obtener_contrato(p_id_cliente cliente.id_usuario%TYPE) RETURN tp_contrato AS
-    p_contrato tp_contrato;
+  PROCEDURE pr_obtener_contrato(p_id_cliente cliente.id_usuario%TYPE,p_contrato OUT tp_contrato) AS
   BEGIN
     SELECT id_contrato,fecha_inicio,fecha_termino,fecha_facturacion,id_cliente,id_plan
     INTO p_contrato.id_contrato,p_contrato.fecha_inicio,p_contrato.fecha_termino,p_contrato.fecha_facturacion,p_contrato.id_cliente,p_contrato.id_plan
     FROM contrato
     WHERE p_id_cliente = p_id_cliente;
-    RETURN p_contrato;
   END;
 
   PROCEDURE pr_insertar_contrato(p_contrato IN OUT tp_contrato) AS
@@ -568,63 +559,57 @@ CREATE OR REPLACE PACKAGE pkg_trabajador AS
 
   TYPE tb_trabajador IS TABLE OF tp_trabajador;
 
-  PROCEDURE pr_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE) RETURN tp_trabajador;
-  PROCEDURE pr_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE) RETURN tb_trabajador;
-  PROCEDURE pr_obtener_trabajadop_cliente(p_id_cliente cliente.id_cliente%TYPE) RETURN tb_trabajador;
+  PROCEDURE pr_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p_trabajador OUT tp_trabajador) ;
+  PROCEDURE pr_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE, p_trabajador OUT tb_trabajador);
+  PROCEDURE pr_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE, p_trabajador OUT tb_trabajador);
   PROCEDURE pr_insertar_trabajador(p_trabajador IN OUT tp_trabajador);
-  PROCEDURE pr_insertar_trabajadop_actividad(p_id_trabajador trabajador.id_trabajador%TYPE, p_id_actividad actividad.id_actividad%TYPE);
+  PROCEDURE pr_insertar_trabajador_actividad(p_id_trabajador trabajador.id_trabajador%TYPE, p_id_actividad actividad.id_actividad%TYPE);
   PROCEDURE pr_eliminar_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE);
   PROCEDURE pr_modificar_trabajador(p_trabajador IN OUT tp_trabajador);
 END pkg_trabajador;
 /
 CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
-  PROCEDURE pr_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE) RETURN tp_trabajador AS
-    p_trabajador tp_trabajador;
+  PROCEDURE pr_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p_trabajador OUT tp_trabajador) AS
   BEGIN
     SELECT id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente
     INTO p_trabajador.id_trabajador,p_trabajador.rut,p_trabajador.dv,p_trabajador.nombre,p_trabajador.apellido_paterno,p_trabajador.apellido_materno,p_trabajador.id_cliente
     FROM trabajador
     WHERE id_trabajador = p_id_trabajador;
-    RETURN p_trabajador;
   END;
 
-  PROCEDURE pr_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE) RETURN tb_trabajador AS
-    CURSOR trabajadop_cursor  IS
+  PROCEDURE pr_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE, p_trabajador OUT tb_trabajador)  AS
+    CURSOR trabajador_cursor  IS
     SELECT id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente
     FROM trabajador join actividad_trabajador USING(id_trabajador)
     WHERE id_actividad = p_id_actividad;
-    p_trabajador tb_trabajador;
   BEGIN
-    OPEN trabajadop_cursor;
+    OPEN trabajador_cursor;
       LOOP
-          FETCH trabajadop_cursor BULK COLLECT INTO p_trabajador;
-          EXIT WHEN trabajadop_cursor%NOTFOUND;
+          FETCH trabajador_cursor BULK COLLECT INTO p_trabajador;
+          EXIT WHEN trabajador_cursor%NOTFOUND;
       END LOOP;
-    RETURN p_trabajador;
   END;
 
-  PROCEDURE pr_obtener_trabajadop_cliente(p_id_cliente cliente.id_cliente%TYPE) RETURN tb_trabajador AS
-    CURSOR trabajadop_cursor  IS
+  PROCEDURE pr_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE, p_trabajador OUT tb_trabajador)  AS
+    CURSOR trabajador_cursor  IS
     SELECT id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente
     FROM trabajador
     WHERE id_cliente = p_id_cliente;
-    p_trabajador tb_trabajador;
   BEGIN
-    OPEN trabajadop_cursor;
+    OPEN trabajador_cursor;
       LOOP
-          FETCH trabajadop_cursor BULK COLLECT INTO p_trabajador;
-          EXIT WHEN trabajadop_cursor%NOTFOUND;
+          FETCH trabajador_cursor BULK COLLECT INTO p_trabajador;
+          EXIT WHEN trabajador_cursor%NOTFOUND;
       END LOOP;
-    RETURN p_trabajador;
   END;
 
   PROCEDURE pr_insertar_trabajador(p_trabajador IN OUT tp_trabajador) AS
   BEGIN
     INSERT INTO trabajador (id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente)
-    VALUES (id_trabajadop_seq.NEXTVAL,p_trabajador.rut,p_trabajador.dv,p_trabajador.nombre,p_trabajador.apellido_paterno,p_trabajador.apellido_materno,p_trabajador.id_cliente);
+    VALUES (id_trabajador_seq.NEXTVAL,p_trabajador.rut,p_trabajador.dv,p_trabajador.nombre,p_trabajador.apellido_paterno,p_trabajador.apellido_materno,p_trabajador.id_cliente);
   END;
 
-  PROCEDURE pr_insertar_trabajadop_actividad(p_id_trabajador trabajador.id_trabajador%TYPE, p_id_actividad actividad.id_actividad%TYPE) AS
+  PROCEDURE pr_insertar_trabajador_actividad(p_id_trabajador trabajador.id_trabajador%TYPE, p_id_actividad actividad.id_actividad%TYPE) AS
   BEGIN
     INSERT INTO actividad_trabajador (id_trabajador, id_actividad)
     VALUES (p_id_trabajador, p_id_actividad);
@@ -657,9 +642,9 @@ CREATE OR REPLACE PACKAGE pkg_incidente AS
 
   TYPE tb_incidente IS TABLE OF tp_incidente;
 
-  PROCEDURE pr_obtener_incidente(p_id_incidente incidente.id_incidente%TYPE) RETURN tp_incidente;
-  PROCEDURE pr_obtener_incidente_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE) RETURN tb_incidente;
-  PROCEDURE pr_obtener_incidente_cliente(p_id_cliente cliente.id_cliente%TYPE) RETURN tb_incidente;
+  PROCEDURE pr_obtener_incidente(p_id_incidente incidente.id_incidente%TYPE, p_incidente OUT tp_incidente);
+  PROCEDURE pr_obtener_incidente_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p_incidente OUT tb_incidente);
+  PROCEDURE pr_obtener_incidente_cliente(p_id_cliente cliente.id_cliente%TYPE, p_incidente OUT tb_incidente);
   PROCEDURE pr_insertar_incidente(p_incidente IN OUT tp_incidente, p_id_trabajador trabajador.id_trabajador%TYPE);
   PROCEDURE pr_eliminar_incidente(p_id_incidente incidente.id_incidente%TYPE);
   PROCEDURE pr_modificar_incidente(p_incidente IN OUT tp_incidente);
@@ -669,51 +654,42 @@ END;
 /
 CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
 
-  PROCEDURE pr_obtener_incidente(p_id_incidente incidente.id_incidente%TYPE) RETURN tp_incidente AS
-    p_incidente tp_incidente;
+  PROCEDURE pr_obtener_incidente(p_id_incidente incidente.id_incidente%TYPE, p_incidente OUT tp_incidente) AS
   BEGIN
     SELECT id_incidente, fecha, descripcion
     INTO p_incidente.id_incidente, p_incidente.fecha, p_incidente.descripcion
     FROM incidente
     WHERE id_incidente = p_id_incidente;
-
-    RETURN p_incidente;
   END;
-  PROCEDURE pr_obtener_incidente_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE) RETURN tb_incidente AS
+  PROCEDURE pr_obtener_incidente_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p_incidente OUT tb_incidente) AS
     CURSOR incidente_cursor IS
     SELECT id_incidente, fecha, descripcion
-    FROM incidente JOIN trabajadop_incidente USING(id_incidente)
+    FROM incidente JOIN trabajador_incidente USING(id_incidente)
     WHERE id_trabajador = p_id_trabajador;
-
-    p_incidente tb_incidente;
   BEGIN
     OPEN incidente_cursor;
       LOOP
           FETCH incidente_cursor BULK COLLECT INTO p_incidente;
           EXIT WHEN incidente_cursor%NOTFOUND;
       END LOOP;
-    RETURN p_incidente;
   END;
-  PROCEDURE pr_obtener_incidente_cliente(p_id_cliente cliente.id_cliente%TYPE) RETURN tb_incidente AS
+  PROCEDURE pr_obtener_incidente_cliente(p_id_cliente cliente.id_cliente%TYPE, p_incidente OUT tb_incidente) AS
     CURSOR incidente_cursor IS
     SELECT id_incidente, fecha, descripcion
-    FROM incidente JOIN trabajadop_incidente USING(id_incidente) JOIN trabajador USING(id_trabajador)
+    FROM incidente JOIN trabajador_incidente USING(id_incidente) JOIN trabajador USING(id_trabajador)
     WHERE id_cliente = p_id_cliente;
-
-    p_incidente tb_incidente;
   BEGIN
     OPEN incidente_cursor;
       LOOP
           FETCH incidente_cursor BULK COLLECT INTO p_incidente;
           EXIT WHEN incidente_cursor%NOTFOUND;
       END LOOP;
-    RETURN p_incidente;
   END;
   PROCEDURE pr_insertar_incidente(p_incidente IN OUT tp_incidente, p_id_trabajador trabajador.id_trabajador%TYPE) AS
   BEGIN
     INSERT INTO incidente (id_incidente, fecha, descripcion)
     VALUES(id_incidente_seq.NEXTVAL, p_incidente.fecha, p_incidente.descripcion);
-    INSERT INTO trabajadop_incidente VALUES(p_id_trabajador, id_incidente_seq.CURRVAL);
+    INSERT INTO trabajador_incidente VALUES(p_id_trabajador, id_incidente_seq.CURRVAL);
   END;
   PROCEDURE pr_eliminar_incidente(p_id_incidente incidente.id_incidente%TYPE) AS
   BEGIN
@@ -741,8 +717,8 @@ CREATE OR REPLACE PACKAGE pkg_notificacion AS
 
   TYPE tb_notificacion IS TABLE OF tp_notificacion;
 
-  PROCEDURE pr_obtener_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE) RETURN tp_notificacion;
-  PROCEDURE pr_obtener_notificacion_usuario(p_id_usuario notificacion.id_usuario%TYPE) RETURN tb_notificacion;
+  PROCEDURE pr_obtener_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE, p_notificacion OUT tp_notificacion);
+  PROCEDURE pr_obtener_notificacion_usuario(p_id_usuario notificacion.id_usuario%TYPE,  p_notificacion OUT tb_notificacion) ;
   PROCEDURE pr_insertar_notificacion(p_notificacion IN OUT tp_notificacion);
   PROCEDURE pr_eliminar_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE);
 
@@ -751,8 +727,7 @@ END;
 
 CREATE OR REPLACE PACKAGE BODY pkg_notificacion AS
 
-  PROCEDURE pr_obtener_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE) RETURN tp_notificacion AS
-    p_notificacion tp_notificacion;
+  PROCEDURE pr_obtener_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE, p_notificacion OUT tp_notificacion) AS
   BEGIN
     SELECT id_notificacion,mensaje,hora,id_usuario
     INTO p_notificacion.id_notificacion,p_notificacion.mensaje,p_notificacion.hora,p_notificacion.id_usuario
@@ -760,19 +735,17 @@ CREATE OR REPLACE PACKAGE BODY pkg_notificacion AS
     WHERE id_notificacion = p_id_notificacion;
   END;
 
-  PROCEDURE pr_obtener_notificacion_usuario(p_id_usuario notificacion.id_usuario%TYPE) RETURN tb_notificacion AS
+  PROCEDURE pr_obtener_notificacion_usuario(p_id_usuario notificacion.id_usuario%TYPE,  p_notificacion OUT tb_notificacion) AS
     CURSOR notificacion_cursor IS
     SELECT id_notificacion,mensaje,hora,id_usuario
     FROM notificacion
     WHERE id_usuario = p_id_usuario;
-    p_notificacion tb_notificacion;
   BEGIN
     OPEN notificacion_cursor;
       LOOP
           FETCH notificacion_cursor BULK COLLECT INTO p_notificacion;
           EXIT WHEN notificacion_cursor%NOTFOUND;
       END LOOP;
-    RETURN p_notificacion;
   END;
 
   PROCEDURE pr_insertar_notificacion(p_notificacion IN OUT tp_notificacion) AS

@@ -701,16 +701,58 @@ END;
 
 CREATE OR REPLACE PACKAGE pkg_notificacion AS
 
+  TYPE tp_notificacion IS RECORD (
+    id_notificacion  NUMBER(38),
+    mensaje          VARCHAR2(1000),
+    hora             DATE,
+    id_usuario       NUMBER(38)
+  );
+
+  TYPE tb_notificacion IS TABLE OF tp_notificacion;
+
   FUNCTION fn_obtener_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE) RETURN tp_notificacion;
   FUNCTION fn_obtener_notificacion_usuario(p_id_usuario notificacion.id_usuario%TYPE) RETURN tb_notificacion;
-  PROCEDURE pr_insertar_notificacion(id_usuario)
+  PROCEDURE pr_insertar_notificacion(p_notificacion IN OUT tp_notificacion);
+  PROCEDURE pr_eliminar_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE);
+
 END;
 /
 
 CREATE OR REPLACE PACKAGE BODY pkg_notificacion AS
 
-  FUNCTION fn_obtener_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE) RETURN tp_notificacion;
-  FUNCTION fn_obtener_notificacion_usuario(p_id_usuario notificacion.id_usuario%TYPE) RETURN tb_notificacion;
-  PROCEDURE
+  FUNCTION fn_obtener_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE) RETURN tp_notificacion AS
+    r_notificacion tp_notificacion;
+  BEGIN
+    SELECT id_notificacion,mensaje,hora,id_usuario
+    INTO r_notificacion.id_notificacion,r_notificacion.mensaje,r_notificacion.hora,r_notificacion.id_usuario
+    FROM notificacion
+    WHERE id_notificacion = p_id_notificacion;
+  END;
+
+  FUNCTION fn_obtener_notificacion_usuario(p_id_usuario notificacion.id_usuario%TYPE) RETURN tb_notificacion AS
+    CURSOR notificacion_cursor IS
+    SELECT id_notificacion,mensaje,hora,id_usuario
+    FROM notificacion
+    WHERE id_usuario = p_id_usuario;
+    r_notificacion tb_notificacion;
+  BEGIN
+    OPEN notificacion_cursor;
+      LOOP
+          FETCH notificacion_cursor BULK COLLECT INTO r_notificacion;
+          EXIT WHEN notificacion_cursor%NOTFOUND;
+      END LOOP;
+    RETURN r_notificacion;
+  END;
+
+  PROCEDURE pr_insertar_notificacion(p_notificacion IN OUT tp_notificacion) AS
+  BEGIN
+    INSERT INTO notificacion (id_notificacion,mensaje,hora,id_usuario)
+    VALUES (id_notificacion_seq.NEXTVAL,p_notificacion.mensaje,p_notificacion.hora,p_notificacion.id_usuario);
+  END;
+
+  PROCEDURE pr_eliminar_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE) AS
+  BEGIN
+    DELETE FROM notificacion WHERE id_notificacion = p_id_notificacion;
+  END;
 END;
 /

@@ -51,7 +51,7 @@ BEGIN
 END;
 /
 
-desc punto_mejorable;
+desc NOTIFICACION;
 
 
 SELECT * FROm punto_mejorable join actividad using (id_actividad);

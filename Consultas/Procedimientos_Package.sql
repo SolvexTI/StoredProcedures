@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE pkg_profesional AS
 
   TYPE tb_profesional IS TABLE OF tp_profesional;
 
-  FUNCTION fn_obtener_profesional(p_id_usuario usuario.id_usuario%TYPE) RETURN tp_profesional;
+  PROCEDURE fn_obtener_profesional(p_id_usuario usuario.id_usuario%TYPE, p_profesional tp_profesional) ;
   PROCEDURE pr_insertar_profesional(
     p_username in usuario.username%TYPE,
     p_password in usuario.password%TYPE,
@@ -36,14 +36,24 @@ END pkg_profesional;
 
 CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
 
-  FUNCTION fn_obtener_profesional (p_id_usuario usuario.id_usuario%TYPE) RETURN tp_profesional AS
+  PROCEDURE fn_obtener_profesional (p_id_usuario usuario.id_usuario%TYPE, p_profesional OUT tp_profesional) AS
     r_profesional tp_profesional;
+/**************************************************************************************************************
+   NAME:       	fn_obtener_profesional
+   PURPOSE		Obtiene datos de profesional segun su id de usuario
+
+   REVISIONS:
+   Ver          Date           Author                               Description
+   ---------    ----------     -------------------                  ----------------------------------------------
+   1.1           04/06/2020     Alejandro Del Pino       		       	1. Creacion Funcion
+   
+***************************************************************************************************************/
   BEGIN
     SELECT id_usuario,username,password,telefono,correo,id_profesional,nombre,apellido_paterno,apellido_materno,rut,dv
     INTO r_profesional.id_usuario,r_profesional.username,r_profesional.password,r_profesional.telefono,r_profesional.correo,r_profesional.id_profesional,r_profesional.nombre,r_profesional.apellido_paterno,r_profesional.apellido_materno,r_profesional.rut,r_profesional.dv
     FROM USUARIO u join PROFESIONAL p using (id_usuario)
     WHERE id_usuario = p_id_usuario;
-    RETURN r_profesional;
+
   END;
 
   PROCEDURE pr_insertar_profesional(
@@ -57,6 +67,16 @@ CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
     p_rut in profesional.rut%TYPE,
     p_dv in profesional.dv%TYPE,
     p_profesional out tp_profesional) AS
+/**************************************************************************************************************
+   NAME:       	pr_obtener_profesional
+   PURPOSE		Inserta datos de profesional y usuario
+
+   REVISIONS:
+   Ver          Date           Author                               Description
+   ---------    ----------     -------------------                  ----------------------------------------------
+   1.1           04/06/2020     Alejandro Del Pino       		       	1. Creacion Procedimiento
+
+***************************************************************************************************************/
   BEGIN
 
     INSERT INTO usuario (id_usuario,username, password, telefono, correo, id_rol)
@@ -69,6 +89,17 @@ CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
   END;
 
   PROCEDURE pr_eliminar_profesional(p_id_usuario in usuario.id_usuario%TYPE) AS
+  /**************************************************************************************************************
+     NAME:       	pr_obtener_profesional
+       PURPOSE		Elimina datos de profesional y usuario
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creacion Procedimiento
+
+  ***************************************************************************************************************/
+
   BEGIN
     DELETE FROM profesional WHERE id_usuario = p_id_usuario;
     DELETE FROM usuario WHERE id_usuario = p_id_usuario;
@@ -112,6 +143,16 @@ END pkg_cliente;
 CREATE OR REPLACE PACKAGE BODY pkg_cliente AS
   FUNCTION fn_obtener_cliente (p_id_usuario usuario.id_usuario%TYPE) RETURN tp_cliente
   AS
+    /**************************************************************************************************************
+       NAME:       	pr_obtener_profesional
+       PURPOSE		Obtiene datos de cliente y usuario
+
+       REVISIONS:
+       Ver          Date           Author                               Description
+       ---------    ----------     -------------------                  ----------------------------------------------
+       1.1           04/06/2020     Alejandro Del Pino       		       	1. Creacion Funcion
+
+    ***************************************************************************************************************/
     r_cliente tp_cliente;
   BEGIN
     SELECT id_usuario,username,password,telefono,correo,id_cliente,nombre,direccion,rubro,id_profesional

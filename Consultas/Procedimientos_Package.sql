@@ -34,7 +34,6 @@ CREATE OR REPLACE PACKAGE pkg_profesional AS
 END pkg_profesional;
 /
 
-
 CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
 
   FUNCTION fn_obtener_profesional (p_id_usuario usuario.id_usuario%TYPE) RETURN tp_profesional AS
@@ -76,7 +75,6 @@ CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
   END;
 END pkg_profesional;
 /
-
 
 CREATE OR REPLACE PACKAGE pkg_cliente AS
 
@@ -304,3 +302,273 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
   END;
 END pkg_actividad;
 /
+
+CREATE OR REPLACE PACKAGE pkg_punto_mejorable AS
+
+  TYPE tp_punto_mejorable IS RECORD (
+    id_punto_mejorable NUMBER(38),
+    titulo             VARCHAR2(80),
+    descripcion        VARCHAR2(300),
+    cumplido           CHAR(1),
+    resultado          VARCHAR2(300),
+    id_actividad       NUMBER(38)
+  );
+
+  TYPE tb_punto_mejorable IS TABLE OF tp_punto_mejorable;
+
+  FUNCTION fn_obtener_punto_mejorable(p_id_punto_mejorable punto_mejorable.id_punto_mejorable%TYPE) RETURN tp_punto_mejorable;
+  FUNCTION fn_obtener_punto_mejorable_activadad(p_id_actividad actividad.id_actividad%TYPE) RETURN tb_punto_mejorable;
+  PROCEDURE pr_insertar_punto_mejorable (
+    p_titulo IN punto_mejorable.titulo%TYPE,
+    p_descripcion IN punto_mejorable.descripcion%TYPE,
+    p_cumplido IN punto_mejorable.cumplido%TYPE,
+    p_resultado IN punto_mejorable.resultado%TYPE,
+    p_id_actividad IN punto_mejorable.id_actividad%TYPE,
+    p_punto_mejorable OUT tp_punto_mejorable
+  );
+  PROCEDURE pr_eliminar_punto_mejorable(p_id_punto_mejorable punto_mejorable.id_punto_mejorable%TYPE);
+  PROCEDURE pr_modificar_punto_mejorable(p_punto_mejorable in tp_punto_mejorable);
+
+END pkg_punto_mejorable;
+/
+
+
+CREATE OR REPLACE PACKAGE BODY pkg_punto_mejorable AS
+
+  FUNCTION fn_obtener_punto_mejorable(p_id_punto_mejorable punto_mejorable.id_punto_mejorable%TYPE) RETURN tp_punto_mejorable AS
+    r_punto_mejorable tp_punto_mejorable;
+  BEGIN
+    SELECT id_punto_mejorable,titulo,descripcion,cumplido,resultado,id_actividad
+    INTO r_punto_mejorable.id_punto_mejorable, r_punto_mejorable.titulo, r_punto_mejorable.descripcion, r_punto_mejorable.cumplido, r_punto_mejorable.resultado, r_punto_mejorable.id_actividad
+    FROM punto_mejorable
+    WHERE id_punto_mejorable = p_id_punto_mejorable;
+
+    RETURN r_punto_mejorable;
+  END;
+
+  FUNCTION fn_obtener_punto_mejorable_activadad(p_id_actividad actividad.id_actividad%TYPE) RETURN tb_punto_mejorable AS
+
+    CURSOR act_cursor  IS
+    SELECT id_punto_mejorable,titulo,descripcion,cumplido,resultado,id_actividad
+    FROM punto_mejorable
+    WHERE id_actividad = p_id_actividad;
+
+    r_punto_mejorable tb_punto_mejorable;
+  BEGIN
+    OPEN act_cursor;
+      LOOP
+          FETCH act_cursor BULK COLLECT INTO r_punto_mejorable;
+          EXIT WHEN act_cursor%NOTFOUND;
+      END LOOP;
+
+    RETURN r_punto_mejorable;
+  END;
+
+  PROCEDURE pr_insertar_punto_mejorable (
+    p_titulo IN punto_mejorable.titulo%TYPE,
+    p_descripcion IN punto_mejorable.descripcion%TYPE,
+    p_cumplido IN punto_mejorable.cumplido%TYPE,
+    p_resultado IN punto_mejorable.resultado%TYPE,
+    p_id_actividad IN punto_mejorable.id_actividad%TYPE,
+    p_punto_mejorable OUT tp_punto_mejorable
+  )AS
+  BEGIN
+    INSERT INTO punto_mejorable (id_punto_mejorable,titulo,descripcion,cumplido,resultado,id_actividad)
+    VALUES ( id_punto_mejorable_seq.NEXTVAL,p_titulo,p_descripcion,p_cumplido,p_resultado,p_id_actividad);
+
+    p_punto_mejorable := fn_obtener_punto_mejorable(id_punto_mejorable_seq.CURRVAL);
+
+  END;
+
+  PROCEDURE pr_eliminar_punto_mejorable(p_id_punto_mejorable punto_mejorable.id_punto_mejorable%TYPE) AS
+  BEGIN
+    DELETE FROM punto_mejorable WHERE id_punto_mejorable = p_id_punto_mejorable;
+  END;
+
+  PROCEDURE pr_modificar_punto_mejorable(p_punto_mejorable in tp_punto_mejorable) AS
+  BEGIN
+    UPDATE punto_mejorable
+    SET id_punto_mejorable = p_punto_mejorable.id_punto_mejorable,
+        titulo = p_punto_mejorable.titulo,
+        descripcion = p_punto_mejorable.descripcion,
+        cumplido = p_punto_mejorable.cumplido,
+        resultado = p_punto_mejorable.resultado,
+        id_actividad = p_punto_mejorable.id_actividad
+
+    WHERE id_punto_mejorable = p_punto_mejorable.id_punto_mejorable;
+  END;
+
+END ;
+/
+
+
+CREATE OR REPLACE PACKAGE pkg_plan AS
+
+  TYPE tp_plan IS RECORD (
+    id_plan      NUMBER(38),
+    valor        NUMBER(38),
+    descripcion  VARCHAR2(300)
+  );
+
+  TYPE tb_plan IS TABLE OF tp_plan;
+
+  FUNCTION fn_obtener_plan(p_id_plan plan.id_plan%TYPE) RETURN tp_plan;
+  FUNCTION fn_obtener_planes RETURN tb_plan;
+  PROCEDURE pr_insertar_plan (p_plan IN OUT tp_plan);
+  PROCEDURE pr_eliminar_plan (p_id_plan plan.id_plan%TYPE);
+  PROCEDURE pr_modificar_plan (p_plan IN OUT tp_plan);
+
+END pkg_plan;
+/
+
+CREATE OR REPLACE PACKAGE BODY pkg_plan AS
+  FUNCTION fn_obtener_plan(p_id_plan plan.id_plan%TYPE) RETURN tp_plan AS
+    r_plan tp_plan;
+  BEGIN
+    SELECT id_plan,valor,descripcion
+    INTO r_plan.id_plan,r_plan.valor,r_plan.descripcion
+    FROM plan
+    WHERE id_plan = p_id_plan;
+  END;
+
+  FUNCTION fn_obtener_planes RETURN tb_plan AS
+    CURSOR plan_cursor  IS
+    SELECT id_plan,valor,descripcion
+    FROM plan;
+    r_plan tb_plan;
+  BEGIN
+    OPEN plan_cursor;
+      LOOP
+          FETCH plan_cursor BULK COLLECT INTO r_plan;
+          EXIT WHEN plan_cursor%NOTFOUND;
+      END LOOP;
+    RETURN r_plan;
+  END;
+
+
+  PROCEDURE pr_insertar_plan (p_plan IN OUT tp_plan) AS
+  BEGIN
+    INSERT INTO plan (id_plan,valor,descripcion)
+    VALUES (id_plan_seq.NEXTVAL,p_plan.valor,p_plan.descripcion);
+  END;
+
+  PROCEDURE pr_eliminar_plan (p_id_plan plan.id_plan%TYPE) AS
+  BEGIN
+    DELETE FROM plan WHERE id_plan = p_id_plan;
+  END;
+
+  PROCEDURE pr_modificar_plan (p_plan IN OUT tp_plan) AS
+  BEGIN
+    UPDATE plan
+    SET valor = p_plan.valor,
+        descripcion = p_plan.descripcion
+    WHERE id_plan = p_plan.id_plan;
+  END;
+
+
+END pkg_plan;
+/
+
+
+CREATE OR REPLACE PACKAGE pkg_contrato AS
+  TYPE tp_contrato IS RECORD (
+    id_contrato        NUMBER(38),
+    fecha_inicio       DATE,
+    fecha_termino      DATE,
+    fecha_facturacion  DATE,
+    id_cliente         NUMBER(38),
+    id_plan            NUMBER(38)
+  );
+
+  TYPE tb_contrato IS TABLE OF tp_contrato;
+
+  FUNCTION fn_obtener_contrato(p_id_cliente cliente.id_usuario%TYPE) RETURN tp_contrato;
+  PROCEDURE pr_insertar_contrato(p_contrato IN OUT tp_contrato);
+  PROCEDURE pr_eliminar_contrato(p_id_cliente cliente.id_usuario%TYPE);
+  PROCEDURE pr_modificar_contrato(p_contrato IN OUT tp_contrato);
+END pkg_contrato;
+/
+CREATE OR REPLACE PACKAGE BODY pkg_contrato AS
+
+  FUNCTION fn_obtener_contrato(p_id_cliente cliente.id_usuario%TYPE) RETURN tp_contrato AS
+    r_contrato tp_contrato;
+  BEGIN
+    SELECT id_contrato,fecha_inicio,fecha_termino,fecha_facturacion,id_cliente,id_plan
+    INTO r_contrato.id_contrato,r_contrato.fecha_inicio,r_contrato.fecha_termino,r_contrato.fecha_facturacion,r_contrato.id_cliente,r_contrato.id_plan
+    FROM contrato
+    WHERE p_id_cliente = p_id_cliente;
+    RETURN r_contrato;
+  END;
+
+  PROCEDURE pr_insertar_contrato(p_contrato IN OUT tp_contrato) AS
+  BEGIN
+    INSERT INTO contrato (id_contrato,fecha_inicio,fecha_termino,fecha_facturacion,id_cliente,id_plan)
+    VALUES(id_contrato_seq.NEXTVAL,p_contrato.fecha_inicio,p_contrato.fecha_termino,p_contrato.fecha_facturacion,p_contrato.id_cliente,p_contrato.id_plan);
+  END;
+
+  PROCEDURE pr_eliminar_contrato(p_id_cliente cliente.id_usuario%TYPE) AS
+  BEGIN
+    DELETE FROM contrato WHERE id_cliente = p_id_cliente;
+  END;
+
+  PROCEDURE pr_modificar_contrato(p_contrato IN OUT tp_contrato) AS
+  BEGIN
+    UPDATE contrato
+    SET fecha_inicio = p_contrato.fecha_inicio,
+        fecha_termino = p_contrato.fecha_termino,
+        fecha_facturacion = p_contrato.fecha_facturacion,
+        id_cliente = p_contrato.id_cliente,
+        id_plan = p_contrato.id_plan
+    WHERE id_contrato = p_contrato.id_contrato;
+  END;
+END pkg_contrato;
+
+CREATE OR REPLACE PACKAGE pkg_trabajador AS
+  TYPE tp_trabajador IS RECORD (
+    id_trabajador     NUMBER(38),
+    rut               NUMBER(38),
+    dv                VARCHAR2(1),
+    nombre            VARCHAR2(120),
+    apellido_paterno  VARCHAR2(80),
+    apellido_materno  VARCHAR2(80),
+    id_cliente        NUMBER(38)
+  );
+
+  TYPE tb_trabajador IS TABLE OF tp_trabajador;
+
+  FUNCTION fn_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE) RETURN tp_trabajador;
+  FUNCTION fn_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE) tb_trabajador;
+  FUNCTION fn_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE) tb_trabajador;
+  PROCEDURE pr_insertar_trabajador(p_trabajador IN OUT tp_trabajador);
+  PROCEDURE pr_eliminar_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE);
+  PROCEDURE pr_modificar_trabajador(p_trabajador IN OUT tp_trabajador);
+END pkg_trabajador;
+CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
+  FUNCTION fn_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE) RETURN tp_trabajador AS
+    r_trabajador tp_trabajador;
+  BEGIN
+    INSERT id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente
+    INTO r_trabajador.id_trabajador,r_trabajador.rut,r_trabajador.dv,r_trabajador.nombre,r_trabajador.apellido_paterno,r_trabajador.apellido_materno,r_trabajador.id_cliente
+    WHERE id_trabajador = p_id_trabajador;
+    RETURN r_trabajador;
+  END;
+  FUNCTION fn_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE) tb_trabajador AS
+    r_trabajador tb_trabajador;
+  BEGIN
+    
+  END;
+  FUNCTION fn_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE) tb_trabajador AS
+    r_trabajador tb_trabajador;
+  BEGIN
+    
+  END;
+  PROCEDURE pr_insertar_trabajador(p_trabajador IN OUT tp_trabajador) AS
+  BEGIN
+  END;
+  PROCEDURE pr_eliminar_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE) AS
+  BEGIN
+  END;
+  PROCEDURE pr_modificar_trabajador(p_trabajador IN OUT tp_trabajador); AS
+  BEGIN
+  END;
+END pkg_trabajador;

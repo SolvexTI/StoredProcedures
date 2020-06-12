@@ -522,6 +522,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_contrato AS
     WHERE id_contrato = p_contrato.id_contrato;
   END;
 END pkg_contrato;
+/
 
 CREATE OR REPLACE PACKAGE pkg_trabajador AS
   TYPE tp_trabajador IS RECORD (
@@ -537,38 +538,72 @@ CREATE OR REPLACE PACKAGE pkg_trabajador AS
   TYPE tb_trabajador IS TABLE OF tp_trabajador;
 
   FUNCTION fn_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE) RETURN tp_trabajador;
-  FUNCTION fn_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE) tb_trabajador;
-  FUNCTION fn_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE) tb_trabajador;
+  FUNCTION fn_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE) RETURN tb_trabajador;
+  FUNCTION fn_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE) RETURN tb_trabajador;
   PROCEDURE pr_insertar_trabajador(p_trabajador IN OUT tp_trabajador);
   PROCEDURE pr_eliminar_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE);
   PROCEDURE pr_modificar_trabajador(p_trabajador IN OUT tp_trabajador);
 END pkg_trabajador;
+/
 CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
   FUNCTION fn_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE) RETURN tp_trabajador AS
     r_trabajador tp_trabajador;
   BEGIN
-    INSERT id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente
-    INTO r_trabajador.id_trabajador,r_trabajador.rut,r_trabajador.dv,r_trabajador.nombre,r_trabajador.apellido_paterno,r_trabajador.apellido_materno,r_trabajador.id_cliente
+    SELECT id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente
+    INTO r_trabajador.id_trabajador,r_trabajador.rut,r_trabajador.dv,r_trabajador.nombre,r_trabajador.apellido_paterno,r_trabajador.apellido_materno,r_trabajador.id_cliente   
+    FROM trabajador
     WHERE id_trabajador = p_id_trabajador;
     RETURN r_trabajador;
   END;
-  FUNCTION fn_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE) tb_trabajador AS
+
+  FUNCTION fn_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE) RETURN tb_trabajador AS
+    CURSOR trabajador_cursor  IS
+    SELECT id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente
+    FROM trabajador join actividad_trabajador USING(id_trabajador)
+    WHERE id_actividad = p_id_actividad;
     r_trabajador tb_trabajador;
   BEGIN
-    
+    OPEN trabajador_cursor;
+      LOOP
+          FETCH trabajador_cursor BULK COLLECT INTO r_trabajador;
+          EXIT WHEN trabajador_cursor%NOTFOUND;
+      END LOOP;
+    RETURN r_trabajador;
   END;
-  FUNCTION fn_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE) tb_trabajador AS
+
+  FUNCTION fn_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE) RETURN tb_trabajador AS
+    CURSOR trabajador_cursor  IS
+    SELECT id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente
+    FROM trabajador
+    WHERE id_cliente = p_id_cliente;
     r_trabajador tb_trabajador;
   BEGIN
-    
+    OPEN trabajador_cursor;
+      LOOP
+          FETCH trabajador_cursor BULK COLLECT INTO r_trabajador;
+          EXIT WHEN trabajador_cursor%NOTFOUND;
+      END LOOP;
+    RETURN r_trabajador;
   END;
+
   PROCEDURE pr_insertar_trabajador(p_trabajador IN OUT tp_trabajador) AS
   BEGIN
+    INSERT INTO trabajador (id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente)
+    VALUES (id_trabajador_seq.NEXTVAL,p_trabajador.rut,p_trabajador.dv,p_trabajador.nombre,p_trabajador.apellido_paterno,p_trabajador.apellido_materno,p_trabajador.id_cliente);
   END;
   PROCEDURE pr_eliminar_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE) AS
   BEGIN
+    DELETE FROM trabajador WHERE id_trabajador = p_id_trabajador;
   END;
-  PROCEDURE pr_modificar_trabajador(p_trabajador IN OUT tp_trabajador); AS
+  PROCEDURE pr_modificar_trabajador(p_trabajador IN OUT tp_trabajador) AS
   BEGIN
+    UPDATE trabajador
+    SET rut = p_trabajador.rut,
+        dv = p_trabajador.dv,
+        nombre = p_trabajador.nombre,
+        apellido_paterno = p_trabajador.apellido_paterno,
+        apellido_materno = p_trabajador.apellido_materno,
+        id_cliente = p_trabajador.id_cliente
+    WHERE id_trabajador = p_trabajador.id_trabajador;
   END;
 END pkg_trabajador;

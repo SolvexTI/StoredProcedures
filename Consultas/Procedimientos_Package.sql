@@ -16,7 +16,7 @@ CREATE OR REPLACE PACKAGE pkg_profesional AS
 
   TYPE tb_profesional IS TABLE OF tp_profesional;
 
-  PROCEDURE fn_obtener_profesional(p_id_usuario usuario.id_usuario%TYPE, p_profesional tp_profesional) ;
+  PROCEDURE fn_obtener_profesional(p_id_usuario usuario.id_usuario%TYPE, p_profesional OUT tp_profesional) ;
   PROCEDURE pr_insertar_profesional(
     p_username in usuario.username%TYPE,
     p_password in usuario.password%TYPE,
@@ -37,7 +37,6 @@ END pkg_profesional;
 CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
 
   PROCEDURE fn_obtener_profesional (p_id_usuario usuario.id_usuario%TYPE, p_profesional OUT tp_profesional) AS
-    r_profesional tp_profesional;
 /**************************************************************************************************************
    NAME:       	fn_obtener_profesional
    PURPOSE		Obtiene datos de profesional segun su id de usuario
@@ -50,7 +49,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
 ***************************************************************************************************************/
   BEGIN
     SELECT id_usuario,username,password,telefono,correo,id_profesional,nombre,apellido_paterno,apellido_materno,rut,dv
-    INTO r_profesional.id_usuario,r_profesional.username,r_profesional.password,r_profesional.telefono,r_profesional.correo,r_profesional.id_profesional,r_profesional.nombre,r_profesional.apellido_paterno,r_profesional.apellido_materno,r_profesional.rut,r_profesional.dv
+    INTO p_profesional.id_usuario,p_profesional.username,p_profesional.password,p_profesional.telefono,p_profesional.correo,p_profesional.id_profesional,p_profesional.nombre,p_profesional.apellido_paterno,p_profesional.apellido_materno,p_profesional.rut,p_profesional.dv
     FROM USUARIO u join PROFESIONAL p using (id_usuario)
     WHERE id_usuario = p_id_usuario;
 
@@ -124,7 +123,7 @@ CREATE OR REPLACE PACKAGE pkg_cliente AS
 
   TYPE tb_cliente IS TABLE OF tp_cliente;
 
-  FUNCTION fn_obtener_cliente(p_id_usuario usuario.id_usuario%TYPE) RETURN tp_cliente;
+  PROCEDURE pr_obtener_cliente(p_id_usuario usuario.id_usuario%TYPE) RETURN tp_cliente;
   PROCEDURE pr_insertar_cliente(
     p_username in usuario.username%TYPE,
     p_password in usuario.password%TYPE,
@@ -141,7 +140,7 @@ END pkg_cliente;
 /
 
 CREATE OR REPLACE PACKAGE BODY pkg_cliente AS
-  FUNCTION fn_obtener_cliente (p_id_usuario usuario.id_usuario%TYPE) RETURN tp_cliente
+  PROCEDURE pr_obtener_cliente (p_id_usuario usuario.id_usuario%TYPE) RETURN tp_cliente
   AS
     /**************************************************************************************************************
        NAME:       	pr_obtener_profesional
@@ -213,9 +212,9 @@ CREATE  OR REPLACE PACKAGE pkg_actividad AS
 
   TYPE tb_actividad IS TABLE OF tp_actividad;
 
-  FUNCTION fn_obtener_actividad(p_id_actividad actividad.id_actividad%TYPE) RETURN tp_actividad;
-  FUNCTION fn_obtener_actividad_profesional(p_id_profesional profesional.id_profesional%TYPE) RETURN tb_actividad;
-  FUNCTION fn_obtener_actividad_cliente(p_id_cliente cliente.id_cliente%TYPE) RETURN tb_actividad;
+  PROCEDURE pr_obtener_actividad(p_id_actividad actividad.id_actividad%TYPE) RETURN tp_actividad;
+  PROCEDURE pr_obtener_actividad_profesional(p_id_profesional profesional.id_profesional%TYPE) RETURN tb_actividad;
+  PROCEDURE pr_obtener_actividad_cliente(p_id_cliente cliente.id_cliente%TYPE) RETURN tb_actividad;
   PROCEDURE pr_insertar_actividad (
     p_nombre in actividad.nombre%type,
     p_descripcion in actividad.descripcion%type,
@@ -235,7 +234,7 @@ END pkg_actividad;
 /
 
 CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
-  FUNCTION fn_obtener_actividad(p_id_actividad actividad.id_actividad%TYPE) RETURN tp_actividad AS
+  PROCEDURE pr_obtener_actividad(p_id_actividad actividad.id_actividad%TYPE) RETURN tp_actividad AS
     r_actividad tp_actividad;
   BEGIN
     SELECT id_actividad,a.nombre,descripcion,estado,fecha_inicio,resultado,cantidad_modificaciones,id_profesional,id_cliente,ta.nombre tipo_actividad
@@ -245,7 +244,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
     RETURN r_actividad;
   END;
 
-  FUNCTION fn_obtener_actividad_profesional(p_id_profesional profesional.id_profesional%TYPE) RETURN tb_actividad AS
+  PROCEDURE pr_obtener_actividad_profesional(p_id_profesional profesional.id_profesional%TYPE) RETURN tb_actividad AS
 
     CURSOR act_cursor  IS
     SELECT id_actividad,a.nombre,descripcion,estado,fecha_inicio,resultado,cantidad_modificaciones,id_profesional,id_cliente,ta.nombre
@@ -263,7 +262,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
     RETURN r_actividad;
   END;
 
-  FUNCTION fn_obtener_actividad_cliente(p_id_cliente cliente.id_cliente%TYPE) RETURN tb_actividad AS
+  PROCEDURE pr_obtener_actividad_cliente(p_id_cliente cliente.id_cliente%TYPE) RETURN tb_actividad AS
 
     CURSOR act_cursor  IS
     SELECT id_actividad,a.nombre,descripcion,estado,fecha_inicio,resultado,cantidad_modificaciones,id_profesional,id_cliente,ta.nombre
@@ -357,8 +356,8 @@ CREATE OR REPLACE PACKAGE pkg_punto_mejorable AS
 
   TYPE tb_punto_mejorable IS TABLE OF tp_punto_mejorable;
 
-  FUNCTION fn_obtener_punto_mejorable(p_id_punto_mejorable punto_mejorable.id_punto_mejorable%TYPE) RETURN tp_punto_mejorable;
-  FUNCTION fn_obtener_punto_mejorable_activadad(p_id_actividad actividad.id_actividad%TYPE) RETURN tb_punto_mejorable;
+  PROCEDURE pr_obtener_punto_mejorable(p_id_punto_mejorable punto_mejorable.id_punto_mejorable%TYPE) RETURN tp_punto_mejorable;
+  PROCEDURE pr_obtener_punto_mejorable_activadad(p_id_actividad actividad.id_actividad%TYPE) RETURN tb_punto_mejorable;
   PROCEDURE pr_insertar_punto_mejorable (
     p_titulo IN punto_mejorable.titulo%TYPE,
     p_descripcion IN punto_mejorable.descripcion%TYPE,
@@ -376,7 +375,7 @@ END pkg_punto_mejorable;
 
 CREATE OR REPLACE PACKAGE BODY pkg_punto_mejorable AS
 
-  FUNCTION fn_obtener_punto_mejorable(p_id_punto_mejorable punto_mejorable.id_punto_mejorable%TYPE) RETURN tp_punto_mejorable AS
+  PROCEDURE pr_obtener_punto_mejorable(p_id_punto_mejorable punto_mejorable.id_punto_mejorable%TYPE) RETURN tp_punto_mejorable AS
     r_punto_mejorable tp_punto_mejorable;
   BEGIN
     SELECT id_punto_mejorable,titulo,descripcion,cumplido,resultado,id_actividad
@@ -387,7 +386,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_punto_mejorable AS
     RETURN r_punto_mejorable;
   END;
 
-  FUNCTION fn_obtener_punto_mejorable_activadad(p_id_actividad actividad.id_actividad%TYPE) RETURN tb_punto_mejorable AS
+  PROCEDURE pr_obtener_punto_mejorable_activadad(p_id_actividad actividad.id_actividad%TYPE) RETURN tb_punto_mejorable AS
 
     CURSOR act_cursor  IS
     SELECT id_punto_mejorable,titulo,descripcion,cumplido,resultado,id_actividad
@@ -453,8 +452,8 @@ CREATE OR REPLACE PACKAGE pkg_plan AS
 
   TYPE tb_plan IS TABLE OF tp_plan;
 
-  FUNCTION fn_obtener_plan(p_id_plan plan.id_plan%TYPE) RETURN tp_plan;
-  FUNCTION fn_obtener_planes RETURN tb_plan;
+  PROCEDURE pr_obtener_plan(p_id_plan plan.id_plan%TYPE) RETURN tp_plan;
+  PROCEDURE pr_obtener_planes RETURN tb_plan;
   PROCEDURE pr_insertar_plan (p_plan IN OUT tp_plan);
   PROCEDURE pr_eliminar_plan (p_id_plan plan.id_plan%TYPE);
   PROCEDURE pr_modificar_plan (p_plan IN OUT tp_plan);
@@ -463,7 +462,7 @@ END pkg_plan;
 /
 
 CREATE OR REPLACE PACKAGE BODY pkg_plan AS
-  FUNCTION fn_obtener_plan(p_id_plan plan.id_plan%TYPE) RETURN tp_plan AS
+  PROCEDURE pr_obtener_plan(p_id_plan plan.id_plan%TYPE) RETURN tp_plan AS
     r_plan tp_plan;
   BEGIN
     SELECT id_plan,valor,descripcion
@@ -472,7 +471,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_plan AS
     WHERE id_plan = p_id_plan;
   END;
 
-  FUNCTION fn_obtener_planes RETURN tb_plan AS
+  PROCEDURE pr_obtener_planes RETURN tb_plan AS
     CURSOR plan_cursor  IS
     SELECT id_plan,valor,descripcion
     FROM plan;
@@ -523,7 +522,7 @@ CREATE OR REPLACE PACKAGE pkg_contrato AS
 
   TYPE tb_contrato IS TABLE OF tp_contrato;
 
-  FUNCTION fn_obtener_contrato(p_id_cliente cliente.id_usuario%TYPE) RETURN tp_contrato;
+  PROCEDURE pr_obtener_contrato(p_id_cliente cliente.id_usuario%TYPE) RETURN tp_contrato;
   PROCEDURE pr_insertar_contrato(p_contrato IN OUT tp_contrato);
   PROCEDURE pr_eliminar_contrato(p_id_cliente cliente.id_usuario%TYPE);
   PROCEDURE pr_modificar_contrato(p_contrato IN OUT tp_contrato);
@@ -531,7 +530,7 @@ END pkg_contrato;
 /
 CREATE OR REPLACE PACKAGE BODY pkg_contrato AS
 
-  FUNCTION fn_obtener_contrato(p_id_cliente cliente.id_usuario%TYPE) RETURN tp_contrato AS
+  PROCEDURE pr_obtener_contrato(p_id_cliente cliente.id_usuario%TYPE) RETURN tp_contrato AS
     r_contrato tp_contrato;
   BEGIN
     SELECT id_contrato,fecha_inicio,fecha_termino,fecha_facturacion,id_cliente,id_plan
@@ -578,9 +577,9 @@ CREATE OR REPLACE PACKAGE pkg_trabajador AS
 
   TYPE tb_trabajador IS TABLE OF tp_trabajador;
 
-  FUNCTION fn_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE) RETURN tp_trabajador;
-  FUNCTION fn_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE) RETURN tb_trabajador;
-  FUNCTION fn_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE) RETURN tb_trabajador;
+  PROCEDURE pr_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE) RETURN tp_trabajador;
+  PROCEDURE pr_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE) RETURN tb_trabajador;
+  PROCEDURE pr_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE) RETURN tb_trabajador;
   PROCEDURE pr_insertar_trabajador(p_trabajador IN OUT tp_trabajador);
   PROCEDURE pr_insertar_trabajador_actividad(p_id_trabajador trabajador.id_trabajador%TYPE, p_id_actividad actividad.id_actividad%TYPE);
   PROCEDURE pr_eliminar_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE);
@@ -588,7 +587,7 @@ CREATE OR REPLACE PACKAGE pkg_trabajador AS
 END pkg_trabajador;
 /
 CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
-  FUNCTION fn_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE) RETURN tp_trabajador AS
+  PROCEDURE pr_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE) RETURN tp_trabajador AS
     r_trabajador tp_trabajador;
   BEGIN
     SELECT id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente
@@ -598,7 +597,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
     RETURN r_trabajador;
   END;
 
-  FUNCTION fn_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE) RETURN tb_trabajador AS
+  PROCEDURE pr_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE) RETURN tb_trabajador AS
     CURSOR trabajador_cursor  IS
     SELECT id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente
     FROM trabajador join actividad_trabajador USING(id_trabajador)
@@ -613,7 +612,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
     RETURN r_trabajador;
   END;
 
-  FUNCTION fn_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE) RETURN tb_trabajador AS
+  PROCEDURE pr_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE) RETURN tb_trabajador AS
     CURSOR trabajador_cursor  IS
     SELECT id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente
     FROM trabajador
@@ -667,9 +666,9 @@ CREATE OR REPLACE PACKAGE pkg_incidente AS
 
   TYPE tb_incidente IS TABLE OF tp_incidente;
 
-  FUNCTION fn_obtener_incidente(p_id_incidente incidente.id_incidente%TYPE) RETURN tp_incidente;
-  FUNCTION fn_obtener_incidente_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE) RETURN tb_incidente;
-  FUNCTION fn_obtener_incidente_cliente(p_id_cliente cliente.id_cliente%TYPE) RETURN tb_incidente;
+  PROCEDURE pr_obtener_incidente(p_id_incidente incidente.id_incidente%TYPE) RETURN tp_incidente;
+  PROCEDURE pr_obtener_incidente_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE) RETURN tb_incidente;
+  PROCEDURE pr_obtener_incidente_cliente(p_id_cliente cliente.id_cliente%TYPE) RETURN tb_incidente;
   PROCEDURE pr_insertar_incidente(p_incidente IN OUT tp_incidente, p_id_trabajador trabajador.id_trabajador%TYPE);
   PROCEDURE pr_eliminar_incidente(p_id_incidente incidente.id_incidente%TYPE);
   PROCEDURE pr_modificar_incidente(p_incidente IN OUT tp_incidente);
@@ -679,7 +678,7 @@ END;
 /
 CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
 
-  FUNCTION fn_obtener_incidente(p_id_incidente incidente.id_incidente%TYPE) RETURN tp_incidente AS
+  PROCEDURE pr_obtener_incidente(p_id_incidente incidente.id_incidente%TYPE) RETURN tp_incidente AS
     r_incidente tp_incidente;
   BEGIN
     SELECT id_incidente, fecha, descripcion
@@ -689,7 +688,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
 
     RETURN r_incidente;
   END;
-  FUNCTION fn_obtener_incidente_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE) RETURN tb_incidente AS
+  PROCEDURE pr_obtener_incidente_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE) RETURN tb_incidente AS
     CURSOR incidente_cursor IS
     SELECT id_incidente, fecha, descripcion
     FROM incidente JOIN trabajador_incidente USING(id_incidente)
@@ -704,7 +703,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
       END LOOP;
     RETURN r_incidente;
   END;
-  FUNCTION fn_obtener_incidente_cliente(p_id_cliente cliente.id_cliente%TYPE) RETURN tb_incidente AS
+  PROCEDURE pr_obtener_incidente_cliente(p_id_cliente cliente.id_cliente%TYPE) RETURN tb_incidente AS
     CURSOR incidente_cursor IS
     SELECT id_incidente, fecha, descripcion
     FROM incidente JOIN trabajador_incidente USING(id_incidente) JOIN trabajador USING(id_trabajador)
@@ -751,8 +750,8 @@ CREATE OR REPLACE PACKAGE pkg_notificacion AS
 
   TYPE tb_notificacion IS TABLE OF tp_notificacion;
 
-  FUNCTION fn_obtener_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE) RETURN tp_notificacion;
-  FUNCTION fn_obtener_notificacion_usuario(p_id_usuario notificacion.id_usuario%TYPE) RETURN tb_notificacion;
+  PROCEDURE pr_obtener_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE) RETURN tp_notificacion;
+  PROCEDURE pr_obtener_notificacion_usuario(p_id_usuario notificacion.id_usuario%TYPE) RETURN tb_notificacion;
   PROCEDURE pr_insertar_notificacion(p_notificacion IN OUT tp_notificacion);
   PROCEDURE pr_eliminar_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE);
 
@@ -761,7 +760,7 @@ END;
 
 CREATE OR REPLACE PACKAGE BODY pkg_notificacion AS
 
-  FUNCTION fn_obtener_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE) RETURN tp_notificacion AS
+  PROCEDURE pr_obtener_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE) RETURN tp_notificacion AS
     r_notificacion tp_notificacion;
   BEGIN
     SELECT id_notificacion,mensaje,hora,id_usuario
@@ -770,7 +769,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_notificacion AS
     WHERE id_notificacion = p_id_notificacion;
   END;
 
-  FUNCTION fn_obtener_notificacion_usuario(p_id_usuario notificacion.id_usuario%TYPE) RETURN tb_notificacion AS
+  PROCEDURE pr_obtener_notificacion_usuario(p_id_usuario notificacion.id_usuario%TYPE) RETURN tb_notificacion AS
     CURSOR notificacion_cursor IS
     SELECT id_notificacion,mensaje,hora,id_usuario
     FROM notificacion

@@ -29,7 +29,7 @@ CREATE OR REPLACE PACKAGE pkg_profesional AS
     p_dv in profesional.dv%TYPE,
     p_profesional out tp_profesional
   );
-  PROCEDURE pr_eliminar_profesional(p_id_usuario in usuario.id_usuario%TYPE);
+  PROCEDURE pr_eliminar_profesional(p_id_usuario in usuario.id_usuario%TYPE );
 
 END pkg_profesional;
 /
@@ -39,12 +39,12 @@ CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
   PROCEDURE pr_obtener_profesional (p_id_usuario usuario.id_usuario%TYPE, p_profesional OUT tp_profesional) AS
 /**************************************************************************************************************
    NAME:       	pr_obtener_profesional
-   PURPOSE		Obtiene datos de profesional segun su id de usuario
+   PURPOSE		Obtiene datos de profesional segun su ID de usuario
 
    REVISIONS:
    Ver          Date           Author                               Description
    ---------    ----------     -------------------                  ----------------------------------------------
-   1.1           04/06/2020     Alejandro Del Pino       		       	1. Creacion Funcion
+   1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
 ***************************************************************************************************************/
   BEGIN
@@ -67,13 +67,13 @@ CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
     p_dv in profesional.dv%TYPE,
     p_profesional out tp_profesional) AS
 /**************************************************************************************************************
-   NAME:       	pr_obtener_profesional
+   NAME:       	pr_insertar_profesional
    PURPOSE		Inserta datos de profesional y usuario
 
    REVISIONS:
    Ver          Date           Author                               Description
    ---------    ----------     -------------------                  ----------------------------------------------
-   1.1           04/06/2020     Alejandro Del Pino       		       	1. Creacion Procedimiento
+   1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
 ***************************************************************************************************************/
   BEGIN
@@ -89,13 +89,13 @@ CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
 
   PROCEDURE pr_eliminar_profesional(p_id_usuario in usuario.id_usuario%TYPE) AS
   /**************************************************************************************************************
-     NAME:       	pr_obtener_profesional
+     NAME:       	pr_eliminar_profesional
        PURPOSE		Elimina datos de profesional y usuario
 
      REVISIONS:
      Ver          Date           Author                               Description
      ---------    ----------     -------------------                  ----------------------------------------------
-     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creacion Procedimiento
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
   ***************************************************************************************************************/
 
@@ -143,13 +143,13 @@ CREATE OR REPLACE PACKAGE BODY pkg_cliente AS
   PROCEDURE pr_obtener_cliente (p_id_usuario usuario.id_usuario%TYPE, p_cliente OUT tp_cliente)
   AS
     /**************************************************************************************************************
-       NAME:       	pr_obtener_profesional
+       NAME:      pr_obtener_cliente
        PURPOSE		Obtiene datos de cliente y usuario
 
        REVISIONS:
        Ver          Date           Author                               Description
        ---------    ----------     -------------------                  ----------------------------------------------
-       1.1           04/06/2020     Alejandro Del Pino       		       	1. Creacion Funcion
+       1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
     ***************************************************************************************************************/
   BEGIN
@@ -171,6 +171,16 @@ CREATE OR REPLACE PACKAGE BODY pkg_cliente AS
     p_id_profesional in cliente.id_profesional%TYPE,
     p_cliente out tp_cliente)
   AS
+    /**************************************************************************************************************
+       NAME:      pr_insertar_cliente
+       PURPOSE		Inserta datos de usuario y cliente, devuelve el tipo tp_cliente
+
+       REVISIONS:
+       Ver          Date           Author                               Description
+       ---------    ----------     -------------------                  ----------------------------------------------
+       1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+    ***************************************************************************************************************/
   BEGIN
     INSERT INTO usuario (id_usuario,username, password, telefono, correo, id_rol)
     VALUES(id_usuario_seq.NEXTVAL, p_username, p_password, p_telefono, p_correo, 3);
@@ -184,6 +194,16 @@ CREATE OR REPLACE PACKAGE BODY pkg_cliente AS
 
   PROCEDURE pr_eliminar_cliente(p_id_usuario in usuario.id_usuario%TYPE)
   AS
+    /**************************************************************************************************************
+       NAME:      pr_eliminar_cliente
+       PURPOSE		Elimina datos de cliente y usuario segun su ID de usuario
+
+       REVISIONS:
+       Ver          Date           Author                               Description
+       ---------    ----------     -------------------                  ----------------------------------------------
+       1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+    ***************************************************************************************************************/
   BEGIN
     DELETE cliente WHERE id_usuario = p_id_usuario;
     DELETE usuario WHERE id_usuario = p_id_usuario;
@@ -233,6 +253,16 @@ END pkg_actividad;
 
 CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
   PROCEDURE pr_obtener_actividad(p_id_actividad actividad.id_actividad%TYPE,p_actividad OUT tp_actividad) AS
+  /**************************************************************************************************************
+     NAME:      pr_obtener_actividad
+     PURPOSE		Obtiene datos de actividad segun su ID
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
   BEGIN
     SELECT id_actividad,a.nombre,descripcion,estado,fecha_inicio,resultado,cantidad_modificaciones,id_profesional,id_cliente,ta.nombre tipo_actividad
     INTO p_actividad.id_actividad,p_actividad.nombre,p_actividad.descripcion,p_actividad.estado,p_actividad.fecha_inicio,p_actividad.resultado,p_actividad.cantidad_modificaciones,p_actividad.id_profesional,p_actividad.id_cliente,p_actividad.tipo_actividad
@@ -241,7 +271,16 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
   END;
 
   PROCEDURE pr_obtener_actividad_profesional(p_id_profesional profesional.id_profesional%TYPE,p_actividad OUT tb_actividad) AS
+  /**************************************************************************************************************
+     NAME:      pr_obtener_actividad_profesional
+     PURPOSE		Obtiene datos de actividades de un profesional
 
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
     CURSOR act_cursor  IS
     SELECT id_actividad,a.nombre,descripcion,estado,fecha_inicio,resultado,cantidad_modificaciones,id_profesional,id_cliente,ta.nombre
     FROM actividad a join tipo_actividad ta USING(id_tipo_actividad)
@@ -257,7 +296,16 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
   END;
 
   PROCEDURE pr_obtener_actividad_cliente(p_id_cliente cliente.id_cliente%TYPE, p_actividad OUT tb_actividad) AS
+  /**************************************************************************************************************
+     NAME:      pr_obtener_actividad_cliente
+     PURPOSE		Obtiene actividades de un cliente
 
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
     CURSOR act_cursor  IS
     SELECT id_actividad,a.nombre,descripcion,estado,fecha_inicio,resultado,cantidad_modificaciones,id_profesional,id_cliente,ta.nombre
     FROM actividad a join tipo_actividad ta USING(id_tipo_actividad)
@@ -282,8 +330,17 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
     p_id_cliente in actividad.id_cliente%type,
     p_tipo_actividad in tipo_actividad.nombre%type,
     p_actividad out tp_actividad
-  )
-  AS
+  ) AS
+    /**************************************************************************************************************
+       NAME:      pr_insertar_actividad
+       PURPOSE	  Inserta datos de una actividad y devuelve el tipo tp_actividad
+
+       REVISIONS:
+       Ver          Date           Author                               Description
+       ---------    ----------     -------------------                  ----------------------------------------------
+       1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+    ***************************************************************************************************************/
     v_id_tipo_actividad tipo_actividad.id_tipo_actividad%TYPE;
   BEGIN
     SELECT id_tipo_actividad INTO v_id_tipo_actividad FROM tipo_actividad WHERE UPPER(nombre) LIKE UPPER(p_tipo_actividad);
@@ -311,11 +368,31 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
   END;
 
   PROCEDURE pr_eliminar_actividad(p_id_actividad actividad.id_actividad%TYPE) AS
+  /**************************************************************************************************************
+     NAME:       pr_eliminar_actividad
+     PURPOSE		Elimina actividad segun id de actividad
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
   BEGIN
     DELETE actividad WHERE id_actividad = p_id_actividad;
   END;
 
   PROCEDURE pr_modificar_actividad(p_actividad in out tp_actividad) AS
+  /**************************************************************************************************************
+     NAME:      pr_modificar_actividad
+     PURPOSE		Modifica actividad segun su ID
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
     v_id_tipo_actividad tipo_actividad.id_tipo_actividad%TYPE;
   BEGIN
     SELECT id_tipo_actividad INTO v_id_tipo_actividad FROM tipo_actividad WHERE nombre LIKE p_actividad.tipo_actividad;
@@ -367,7 +444,16 @@ END pkg_punto_mejorable;
 CREATE OR REPLACE PACKAGE BODY pkg_punto_mejorable AS
 
   PROCEDURE pr_obtener_punto_mejorable(p_id_punto_mejorable punto_mejorable.id_punto_mejorable%TYPE, p_punto_mejorable OUT tp_punto_mejorable) AS
+  /**************************************************************************************************************
+     NAME:      pr_obtener_punto_mejorable
+     PURPOSE		Obtiene datos de punto mejorable segun su ID
 
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
   BEGIN
     SELECT id_punto_mejorable,titulo,descripcion,cumplido,resultado,id_actividad
     INTO p_punto_mejorable.id_punto_mejorable, p_punto_mejorable.titulo, p_punto_mejorable.descripcion, p_punto_mejorable.cumplido, p_punto_mejorable.resultado, p_punto_mejorable.id_actividad
@@ -376,12 +462,20 @@ CREATE OR REPLACE PACKAGE BODY pkg_punto_mejorable AS
   END;
 
   PROCEDURE pr_obtener_punto_mejorable_activadad(p_id_actividad actividad.id_actividad%TYPE, p_punto_mejorable OUT tb_punto_mejorable) AS
+  /**************************************************************************************************************
+     NAME:      pr_obtener_punto_mejorable_activadad
+     PURPOSE	 Obtiene datos de punto mejorable por actividad
 
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
     CURSOR act_cursor  IS
     SELECT id_punto_mejorable,titulo,descripcion,cumplido,resultado,id_actividad
     FROM punto_mejorable
     WHERE id_actividad = p_id_actividad;
-
   BEGIN
     OPEN act_cursor;
       LOOP
@@ -399,6 +493,16 @@ CREATE OR REPLACE PACKAGE BODY pkg_punto_mejorable AS
     p_id_actividad IN punto_mejorable.id_actividad%TYPE,
     p_punto_mejorable OUT tp_punto_mejorable
   )AS
+  /**************************************************************************************************************
+     NAME:      pr_insertar_punto_mejorable
+     PURPOSE		Inserta datos de un punto mejorable y devuelve el tipo tp_punto_mejorable
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
   BEGIN
     INSERT INTO punto_mejorable (id_punto_mejorable,titulo,descripcion,cumplido,resultado,id_actividad)
     VALUES ( id_punto_mejorable_seq.NEXTVAL,p_titulo,p_descripcion,p_cumplido,p_resultado,p_id_actividad);
@@ -408,11 +512,31 @@ CREATE OR REPLACE PACKAGE BODY pkg_punto_mejorable AS
   END;
 
   PROCEDURE pr_eliminar_punto_mejorable(p_id_punto_mejorable punto_mejorable.id_punto_mejorable%TYPE) AS
+  /**************************************************************************************************************
+     NAME:      pr_eliminar_punto_mejorable
+     PURPOSE		Elimina un punto mejorable sugun su ID
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
   BEGIN
     DELETE FROM punto_mejorable WHERE id_punto_mejorable = p_id_punto_mejorable;
   END;
 
   PROCEDURE pr_modificar_punto_mejorable(p_punto_mejorable in tp_punto_mejorable) AS
+  /**************************************************************************************************************
+     NAME:      pr_modificar_punto_mejorable
+     PURPOSE		Modifica datos de punto mejorable segun su ID
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
   BEGIN
     UPDATE punto_mejorable
     SET id_punto_mejorable = p_punto_mejorable.id_punto_mejorable,
@@ -450,6 +574,16 @@ END pkg_plan;
 
 CREATE OR REPLACE PACKAGE BODY pkg_plan AS
   PROCEDURE pr_obtener_plan(p_id_plan plan.id_plan%TYPE,  p_plan OUT tp_plan)  AS
+  /**************************************************************************************************************
+     NAME:      pr_obtener_plan
+     PURPOSE		Obtiene datos de plan segun su ID
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
   BEGIN
     SELECT id_plan,valor,descripcion
     INTO p_plan.id_plan,p_plan.valor,p_plan.descripcion
@@ -458,6 +592,16 @@ CREATE OR REPLACE PACKAGE BODY pkg_plan AS
   END;
 
   PROCEDURE pr_obtener_planes ( p_plan OUT tb_plan) AS
+  /**************************************************************************************************************
+     NAME:      pr_obtener_planes
+     PURPOSE		Obtiene datos de todos los olanas y devuelve una lista del tipo tp_plan
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
     CURSOR plan_cursor  IS
     SELECT id_plan,valor,descripcion
     FROM plan;
@@ -471,12 +615,32 @@ CREATE OR REPLACE PACKAGE BODY pkg_plan AS
 
 
   PROCEDURE pr_insertar_plan (p_plan IN OUT tp_plan) AS
+  /**************************************************************************************************************
+     NAME:      pr_insertar_plan
+     PURPOSE		Inserta datos de un plan y devuelve el tipo tp_plan
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
   BEGIN
     INSERT INTO plan (id_plan,valor,descripcion)
     VALUES (id_plan_seq.NEXTVAL,p_plan.valor,p_plan.descripcion);
   END;
 
   PROCEDURE pr_eliminar_plan (p_id_plan plan.id_plan%TYPE) AS
+  /**************************************************************************************************************
+     NAME:      pr_eliminar_plan
+     PURPOSE		Eliman datos de plan segun su ID
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
   BEGIN
     DELETE FROM plan WHERE id_plan = p_id_plan;
   END;
@@ -515,6 +679,16 @@ END pkg_contrato;
 CREATE OR REPLACE PACKAGE BODY pkg_contrato AS
 
   PROCEDURE pr_obtener_contrato(p_id_cliente cliente.id_usuario%TYPE,p_contrato OUT tp_contrato) AS
+  /**************************************************************************************************************
+     NAME:      pr_obtener_contrato
+     PURPOSE		Obtiene datos de contrato segun ID de cliente
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
   BEGIN
     SELECT id_contrato,fecha_inicio,fecha_termino,fecha_facturacion,id_cliente,id_plan
     INTO p_contrato.id_contrato,p_contrato.fecha_inicio,p_contrato.fecha_termino,p_contrato.fecha_facturacion,p_contrato.id_cliente,p_contrato.id_plan
@@ -523,12 +697,32 @@ CREATE OR REPLACE PACKAGE BODY pkg_contrato AS
   END;
 
   PROCEDURE pr_insertar_contrato(p_contrato IN OUT tp_contrato) AS
+  /**************************************************************************************************************
+     NAME:       	pr_obtener_profesional
+     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
   BEGIN
     INSERT INTO contrato (id_contrato,fecha_inicio,fecha_termino,fecha_facturacion,id_cliente,id_plan)
     VALUES(id_contrato_seq.NEXTVAL,p_contrato.fecha_inicio,p_contrato.fecha_termino,p_contrato.fecha_facturacion,p_contrato.id_cliente,p_contrato.id_plan);
   END;
 
   PROCEDURE pr_eliminar_contrato(p_id_cliente cliente.id_usuario%TYPE) AS
+  /**************************************************************************************************************
+     NAME:       	pr_obtener_profesional
+     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
   BEGIN
     DELETE FROM contrato WHERE id_cliente = p_id_cliente;
   END;
@@ -569,6 +763,16 @@ CREATE OR REPLACE PACKAGE pkg_trabajador AS
 END pkg_trabajador;
 /
 CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
+/**************************************************************************************************************
+   NAME:       	pr_obtener_profesional
+   PURPOSE		Obtiene datos de profesional segun su ID de usuario
+
+   REVISIONS:
+   Ver          Date           Author                               Description
+   ---------    ----------     -------------------                  ----------------------------------------------
+   1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+***************************************************************************************************************/
   PROCEDURE pr_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p_trabajador OUT tp_trabajador) AS
   BEGIN
     SELECT id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente
@@ -578,6 +782,16 @@ CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
   END;
 
   PROCEDURE pr_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE, p_trabajador OUT tb_trabajador)  AS
+  /**************************************************************************************************************
+     NAME:       	pr_obtener_profesional
+     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
     CURSOR trabajador_cursor  IS
     SELECT id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente
     FROM trabajador join actividad_trabajador USING(id_trabajador)
@@ -591,6 +805,16 @@ CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
   END;
 
   PROCEDURE pr_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE, p_trabajador OUT tb_trabajador)  AS
+  /**************************************************************************************************************
+     NAME:       	pr_obtener_profesional
+     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
     CURSOR trabajador_cursor  IS
     SELECT id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente
     FROM trabajador
@@ -604,12 +828,32 @@ CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
   END;
 
   PROCEDURE pr_insertar_trabajador(p_trabajador IN OUT tp_trabajador) AS
+  /**************************************************************************************************************
+     NAME:       	pr_obtener_profesional
+     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
   BEGIN
     INSERT INTO trabajador (id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente)
     VALUES (id_trabajador_seq.NEXTVAL,p_trabajador.rut,p_trabajador.dv,p_trabajador.nombre,p_trabajador.apellido_paterno,p_trabajador.apellido_materno,p_trabajador.id_cliente);
   END;
 
   PROCEDURE pr_insertar_trabajador_actividad(p_id_trabajador trabajador.id_trabajador%TYPE, p_id_actividad actividad.id_actividad%TYPE) AS
+  /**************************************************************************************************************
+     NAME:       	pr_obtener_profesional
+     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
   BEGIN
     INSERT INTO actividad_trabajador (id_trabajador, id_actividad)
     VALUES (p_id_trabajador, p_id_actividad);
@@ -619,6 +863,16 @@ CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
     DELETE FROM trabajador WHERE id_trabajador = p_id_trabajador;
   END;
   PROCEDURE pr_modificar_trabajador(p_trabajador IN OUT tp_trabajador) AS
+  /**************************************************************************************************************
+     NAME:       	pr_obtener_profesional
+     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
   BEGIN
     UPDATE trabajador
     SET rut = p_trabajador.rut,
@@ -655,6 +909,16 @@ END;
 CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
 
   PROCEDURE pr_obtener_incidente(p_id_incidente incidente.id_incidente%TYPE, p_incidente OUT tp_incidente) AS
+  /**************************************************************************************************************
+     NAME:       	pr_obtener_profesional
+     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
   BEGIN
     SELECT id_incidente, fecha, descripcion
     INTO p_incidente.id_incidente, p_incidente.fecha, p_incidente.descripcion
@@ -662,6 +926,16 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
     WHERE id_incidente = p_id_incidente;
   END;
   PROCEDURE pr_obtener_incidente_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p_incidente OUT tb_incidente) AS
+  /**************************************************************************************************************
+     NAME:       	pr_obtener_profesional
+     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
     CURSOR incidente_cursor IS
     SELECT id_incidente, fecha, descripcion
     FROM incidente JOIN trabajador_incidente USING(id_incidente)
@@ -674,6 +948,16 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
       END LOOP;
   END;
   PROCEDURE pr_obtener_incidente_cliente(p_id_cliente cliente.id_cliente%TYPE, p_incidente OUT tb_incidente) AS
+  /**************************************************************************************************************
+     NAME:       	pr_obtener_profesional
+     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
     CURSOR incidente_cursor IS
     SELECT id_incidente, fecha, descripcion
     FROM incidente JOIN trabajador_incidente USING(id_incidente) JOIN trabajador USING(id_trabajador)
@@ -686,16 +970,46 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
       END LOOP;
   END;
   PROCEDURE pr_insertar_incidente(p_incidente IN OUT tp_incidente, p_id_trabajador trabajador.id_trabajador%TYPE) AS
+  /**************************************************************************************************************
+     NAME:       	pr_obtener_profesional
+     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
   BEGIN
     INSERT INTO incidente (id_incidente, fecha, descripcion)
     VALUES(id_incidente_seq.NEXTVAL, p_incidente.fecha, p_incidente.descripcion);
     INSERT INTO trabajador_incidente VALUES(p_id_trabajador, id_incidente_seq.CURRVAL);
   END;
   PROCEDURE pr_eliminar_incidente(p_id_incidente incidente.id_incidente%TYPE) AS
+  /**************************************************************************************************************
+     NAME:       	pr_obtener_profesional
+     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
   BEGIN
     DELETE FROM incidente WHERE id_incidente = p_id_incidente;
   END;
   PROCEDURE pr_modificar_incidente(p_incidente IN OUT tp_incidente) AS
+  /**************************************************************************************************************
+     NAME:       	pr_obtener_profesional
+     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
   BEGIN
     UPDATE incidente
     SET fecha = p_incidente.fecha,
@@ -728,6 +1042,16 @@ END;
 CREATE OR REPLACE PACKAGE BODY pkg_notificacion AS
 
   PROCEDURE pr_obtener_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE, p_notificacion OUT tp_notificacion) AS
+  /**************************************************************************************************************
+     NAME:       	pr_obtener_profesional
+     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
   BEGIN
     SELECT id_notificacion,mensaje,hora,id_usuario
     INTO p_notificacion.id_notificacion,p_notificacion.mensaje,p_notificacion.hora,p_notificacion.id_usuario
@@ -736,6 +1060,16 @@ CREATE OR REPLACE PACKAGE BODY pkg_notificacion AS
   END;
 
   PROCEDURE pr_obtener_notificacion_usuario(p_id_usuario notificacion.id_usuario%TYPE,  p_notificacion OUT tb_notificacion) AS
+  /**************************************************************************************************************
+     NAME:       	pr_obtener_profesional
+     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
     CURSOR notificacion_cursor IS
     SELECT id_notificacion,mensaje,hora,id_usuario
     FROM notificacion
@@ -749,12 +1083,32 @@ CREATE OR REPLACE PACKAGE BODY pkg_notificacion AS
   END;
 
   PROCEDURE pr_insertar_notificacion(p_notificacion IN OUT tp_notificacion) AS
+  /**************************************************************************************************************
+     NAME:       	pr_obtener_profesional
+     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
   BEGIN
     INSERT INTO notificacion (id_notificacion,mensaje,hora,id_usuario)
     VALUES (id_notificacion_seq.NEXTVAL,p_notificacion.mensaje,p_notificacion.hora,p_notificacion.id_usuario);
   END;
 
   PROCEDURE pr_eliminar_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE) AS
+  /**************************************************************************************************************
+     NAME:       	pr_obtener_profesional
+     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
   BEGIN
     DELETE FROM notificacion WHERE id_notificacion = p_id_notificacion;
   END;

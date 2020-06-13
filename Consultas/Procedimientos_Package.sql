@@ -698,8 +698,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_contrato AS
 
   PROCEDURE pr_insertar_contrato(p_contrato IN OUT tp_contrato) AS
   /**************************************************************************************************************
-     NAME:       	pr_obtener_profesional
-     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+     NAME:      pr_insertar_contrato
+     PURPOSE	  Inserta datos de contrato y devuelve tipos de tp_contrato
 
      REVISIONS:
      Ver          Date           Author                               Description
@@ -714,8 +714,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_contrato AS
 
   PROCEDURE pr_eliminar_contrato(p_id_cliente cliente.id_usuario%TYPE) AS
   /**************************************************************************************************************
-     NAME:       	pr_obtener_profesional
-     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+     NAME:      pr_eliminar_contrato
+     PURPOSE		Elimina datos de contrato segun ID de cliente
 
      REVISIONS:
      Ver          Date           Author                               Description
@@ -763,9 +763,11 @@ CREATE OR REPLACE PACKAGE pkg_trabajador AS
 END pkg_trabajador;
 /
 CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
+
+PROCEDURE pr_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p_trabajador OUT tp_trabajador) AS
 /**************************************************************************************************************
-   NAME:       	pr_obtener_profesional
-   PURPOSE		Obtiene datos de profesional segun su ID de usuario
+   NAME:      pr_obtener_trabajador
+   PURPOSE		Obtiene datos de trabajador segun ID de trabajador
 
    REVISIONS:
    Ver          Date           Author                               Description
@@ -773,7 +775,6 @@ CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
    1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
 ***************************************************************************************************************/
-  PROCEDURE pr_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p_trabajador OUT tp_trabajador) AS
   BEGIN
     SELECT id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente
     INTO p_trabajador.id_trabajador,p_trabajador.rut,p_trabajador.dv,p_trabajador.nombre,p_trabajador.apellido_paterno,p_trabajador.apellido_materno,p_trabajador.id_cliente
@@ -783,8 +784,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
 
   PROCEDURE pr_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE, p_trabajador OUT tb_trabajador)  AS
   /**************************************************************************************************************
-     NAME:       	pr_obtener_profesional
-     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+     NAME:      pr_obtener_trabajadores_actividad
+     PURPOSE		Obtiene datos de trabajadores que asisten a una actividad, devuelve tipo tabla tb_trabajador
 
      REVISIONS:
      Ver          Date           Author                               Description
@@ -806,8 +807,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
 
   PROCEDURE pr_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE, p_trabajador OUT tb_trabajador)  AS
   /**************************************************************************************************************
-     NAME:       	pr_obtener_profesional
-     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+     NAME:      pr_obtener_trabajador_cliente
+     PURPOSE		Obtiene datos de trabajadorres aosciados a un cliente, devuelve tipo tabla tb_trabajador
 
      REVISIONS:
      Ver          Date           Author                               Description
@@ -829,8 +830,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
 
   PROCEDURE pr_insertar_trabajador(p_trabajador IN OUT tp_trabajador) AS
   /**************************************************************************************************************
-     NAME:       	pr_obtener_profesional
-     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+     NAME:      pr_insertar_trabajador
+     PURPOSE		Inserta datos de Trabajador y devuelve tipo tp_trabajador
 
      REVISIONS:
      Ver          Date           Author                               Description
@@ -845,8 +846,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
 
   PROCEDURE pr_insertar_trabajador_actividad(p_id_trabajador trabajador.id_trabajador%TYPE, p_id_actividad actividad.id_actividad%TYPE) AS
   /**************************************************************************************************************
-     NAME:       	pr_obtener_profesional
-     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+     NAME:      pr_insertar_trabajador_actividad
+     PURPOSE		Asocia trabajadores a una actividad determinada segun sus ID's
 
      REVISIONS:
      Ver          Date           Author                               Description
@@ -864,8 +865,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
   END;
   PROCEDURE pr_modificar_trabajador(p_trabajador IN OUT tp_trabajador) AS
   /**************************************************************************************************************
-     NAME:       	pr_obtener_profesional
-     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+     NAME:      r_modificar_trabajador
+     PURPOSE		Modifica datos de trabajador segun ID
 
      REVISIONS:
      Ver          Date           Author                               Description
@@ -910,8 +911,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
 
   PROCEDURE pr_obtener_incidente(p_id_incidente incidente.id_incidente%TYPE, p_incidente OUT tp_incidente) AS
   /**************************************************************************************************************
-     NAME:       	pr_obtener_profesional
-     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+     NAME:       	pr_obtener_incidente
+     PURPOSE		Obtiene datos de incidente segun su ID y devuelve tipo tp_incidente
 
      REVISIONS:
      Ver          Date           Author                               Description
@@ -927,8 +928,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
   END;
   PROCEDURE pr_obtener_incidente_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p_incidente OUT tb_incidente) AS
   /**************************************************************************************************************
-     NAME:       	pr_obtener_profesional
-     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+     NAME:      pr_obtener_incidente_trabajador
+     PURPOSE		Obtiene todos los incidentes segun trabajador y devuelve tipo tabla tb_incidente
 
      REVISIONS:
      Ver          Date           Author                               Description
@@ -949,8 +950,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
   END;
   PROCEDURE pr_obtener_incidente_cliente(p_id_cliente cliente.id_cliente%TYPE, p_incidente OUT tb_incidente) AS
   /**************************************************************************************************************
-     NAME:       	pr_obtener_profesional
-     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+     NAME:      pr_obtener_incidente_cliente
+     PURPOSE		Obtiene todos los incidentes segun cliente y devuelve tipo tabla tb_incidente
 
      REVISIONS:
      Ver          Date           Author                               Description
@@ -971,8 +972,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
   END;
   PROCEDURE pr_insertar_incidente(p_incidente IN OUT tp_incidente, p_id_trabajador trabajador.id_trabajador%TYPE) AS
   /**************************************************************************************************************
-     NAME:       	pr_obtener_profesional
-     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+     NAME:      pr_insertar_incidente
+     PURPOSE	  Inserta datos de incidente y devuelve tipo tp_incidente
 
      REVISIONS:
      Ver          Date           Author                               Description
@@ -987,8 +988,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
   END;
   PROCEDURE pr_eliminar_incidente(p_id_incidente incidente.id_incidente%TYPE) AS
   /**************************************************************************************************************
-     NAME:       	pr_obtener_profesional
-     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+     NAME:    pr_eliminar_incidente
+     PURPOSE	Elimina datos de incidente segun su ID
 
      REVISIONS:
      Ver          Date           Author                               Description
@@ -1001,8 +1002,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
   END;
   PROCEDURE pr_modificar_incidente(p_incidente IN OUT tp_incidente) AS
   /**************************************************************************************************************
-     NAME:       	pr_obtener_profesional
-     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+     NAME:      pr_modificar_incidente
+     PURPOSE	  Modifica datos de incidente
 
      REVISIONS:
      Ver          Date           Author                               Description
@@ -1043,8 +1044,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_notificacion AS
 
   PROCEDURE pr_obtener_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE, p_notificacion OUT tp_notificacion) AS
   /**************************************************************************************************************
-     NAME:       	pr_obtener_profesional
-     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+     NAME:      pr_obtener_notificacion
+     PURPOSE		Obtiene datos de notificacion segun su ID
 
      REVISIONS:
      Ver          Date           Author                               Description
@@ -1061,8 +1062,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_notificacion AS
 
   PROCEDURE pr_obtener_notificacion_usuario(p_id_usuario notificacion.id_usuario%TYPE,  p_notificacion OUT tb_notificacion) AS
   /**************************************************************************************************************
-     NAME:       	pr_obtener_profesional
-     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+     NAME:      pr_obtener_notificacion_usuario
+     PURPOSE		Obtiene datos de notificacion segun su ID de usuario
 
      REVISIONS:
      Ver          Date           Author                               Description
@@ -1084,8 +1085,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_notificacion AS
 
   PROCEDURE pr_insertar_notificacion(p_notificacion IN OUT tp_notificacion) AS
   /**************************************************************************************************************
-     NAME:       	pr_obtener_profesional
-     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+     NAME:      pr_insertar_notificacion
+     PURPOSE		Inserta datos de una notificacion
 
      REVISIONS:
      Ver          Date           Author                               Description
@@ -1100,8 +1101,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_notificacion AS
 
   PROCEDURE pr_eliminar_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE) AS
   /**************************************************************************************************************
-     NAME:       	pr_obtener_profesional
-     PURPOSE		Obtiene datos de profesional segun su ID de usuario
+     NAME:      pr_eliminar_notificacion
+     PURPOSE		Elimina datos de notificacion segun su ID 
 
      REVISIONS:
      Ver          Date           Author                               Description

@@ -8,24 +8,6 @@
    1.1.1-1.1    02/06/2020     Alejandro Del Pino       			1. Creacion de Secuencias
    
 ***************************************************************************************************************/
-/**************************************ZONA ELIMINACION SECUENCIAS*********************************************/
-
- DROP SEQUENCE ID_ACTIVIDAD_SEQ;
- DROP SEQUENCE ID_BOLETA_SEQ;
- DROP SEQUENCE ID_CLIENTE_SEQ;
- DROP SEQUENCE ID_CONTRATO_SEQ;
- DROP SEQUENCE ID_INCIDENTE_SEQ;
- DROP SEQUENCE ID_MODIFICACION;
- DROP SEQUENCE ID_PUNTO_MEJORABLE_SEQ;
- DROP SEQUENCE ID_ROL_SEQ;
- DROP SEQUENCE ID_TIPO_ACTIVIDAD_SEQ;
- DROP SEQUENCE ID_TRABAJADOR_SEQ;
- DROP SEQUENCE ID_USUARIO_SEQ;
- DROP SEQUENCE ID_NOTIFICACION_SEQ;
- DROP SEQUENCE ID_PLAN_SEQ;
- DROP SEQUENCE ID_PROFESIONAL_SEQ;
- 
- /**************************************ZONA CREACION SECUENCIAS*********************************************/
  
  CREATE SEQUENCE ID_ACTIVIDAD_SEQ START WITH 1;
  CREATE SEQUENCE ID_BOLETA_SEQ START WITH 1;

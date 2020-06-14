@@ -1,3 +1,14 @@
+CREATE OR REPLACE PACKAGE pkg_autenticacion AS
+
+END pkg_autenticacion;
+/
+
+CREATE OR REPLACE PACKAGE BODY pkg_autenticacion AS
+
+END pkg_autenticacion;
+/
+
+
 CREATE OR REPLACE PACKAGE pkg_profesional AS
 
   TYPE tp_profesional IS RECORD (
@@ -16,27 +27,18 @@ CREATE OR REPLACE PACKAGE pkg_profesional AS
 
   TYPE tb_profesional IS TABLE OF tp_profesional;
 
-  PROCEDURE pr_obtener_profesional(p_id_usuario usuario.id_usuario%TYPE, p_profesional OUT tp_profesional) ;
-  PROCEDURE pr_insertar_profesional(
-    p_username in usuario.username%TYPE,
-    p_password in usuario.password%TYPE,
-    p_telefono in usuario.telefono%TYPE,
-    p_correo in usuario.correo%TYPE,
-    p_nombre in profesional.nombre%TYPE,
-    p_apellido_paterno in profesional.apellido_paterno%TYPE,
-    p_apellido_materno in profesional.apellido_materno%TYPE,
-    p_rut in profesional.rut%TYPE,
-    p_dv in profesional.dv%TYPE,
-    p_profesional out tp_profesional
-  );
-  PROCEDURE pr_eliminar_profesional(p_id_usuario in usuario.id_usuario%TYPE );
+  PROCEDURE pr_obtener_profesional(p_id_usuario IN profesional.id_usuario%TYPE,p_profesional OUT tp_profesional);
+  PROCEDURE pr_obtener_profesionales(p_profesional OUT tb_profesional);
+  PROCEDURE pr_insertar_profesional(p_profesional IN OUT tp_profesional);
+  PROCEDURE pr_modificar_profesional(p_profesional OUT tp_profesional);
+  PROCEDURE pr_eliminar_profesional(p_profesional IN OUT tp_profesional);
 
 END pkg_profesional;
 /
 
 CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
 
-  PROCEDURE pr_obtener_profesional (p_id_usuario usuario.id_usuario%TYPE, p_profesional OUT tp_profesional) AS
+  PROCEDURE pr_obtener_profesional (p_id_usuario IN profesional.id_usuario%TYPE, p_profesional OUT tp_profesional) AS
 /**************************************************************************************************************
    NAME:       	pr_obtener_profesional
    PURPOSE		Obtiene datos de profesional segun su ID de usuario
@@ -48,24 +50,37 @@ CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
 
 ***************************************************************************************************************/
   BEGIN
-    SELECT id_usuario,username,password,telefono,correo,id_profesional,nombre,apellido_paterno,apellido_materno,rut,dv
-    INTO p_profesional.id_usuario,p_profesional.username,p_profesional.password,p_profesional.telefono,p_profesional.correo,p_profesional.id_profesional,p_profesional.nombre,p_profesional.apellido_paterno,p_profesional.apellido_materno,p_profesional.rut,p_profesional.dv
-    FROM USUARIO u join PROFESIONAL p using (id_usuario)
+    SELECT username,password,telefono,correo,
+    id_profesional,nombre,apellido_paterno,apellido_materno,rut,dv
+    INTO p_profesional.username,p_profesional.password,p_profesional.telefono,p_profesional.correo,
+    p_profesional.id_profesional,p_profesional.nombre,p_profesional.apellido_paterno,p_profesional.apellido_materno,p_profesional.rut,p_profesional.dv
+    FROM usuario JOIN profesional USING(id_usuario)
     WHERE id_usuario = p_id_usuario;
-
   END;
 
-  PROCEDURE pr_insertar_profesional(
-    p_username in usuario.username%TYPE,
-    p_password in usuario.password%TYPE,
-    p_telefono in usuario.telefono%TYPE,
-    p_correo in usuario.correo%TYPE,
-    p_nombre in profesional.nombre%TYPE,
-    p_apellido_paterno in profesional.apellido_paterno%TYPE,
-    p_apellido_materno in profesional.apellido_materno%TYPE,
-    p_rut in profesional.rut%TYPE,
-    p_dv in profesional.dv%TYPE,
-    p_profesional out tp_profesional) AS
+  PROCEDURE pr_obtener_profesionales(p_profesional OUT tb_profesional) AS
+  /**************************************************************************************************************
+     NAME:      pr_obtener_profesionales
+     PURPOSE		Lista datos de todos los profesionales junto con los datos de usuario
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           14/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
+    CURSOR profesional_cursor  IS
+    SELECT id_usuario,username,password,telefono,correo,id_profesional,nombre,apellido_paterno,apellido_materno,rut,dv
+    FROM usuario u JOIN profesional p USING(id_usuario);
+  BEGIN
+    OPEN profesional_cursor;
+      LOOP
+          FETCH profesional_cursor BULK COLLECT INTO p_profesional;
+          EXIT WHEN profesional_cursor%NOTFOUND;
+      END LOOP;
+  END;
+
+  PROCEDURE pr_insertar_profesional(p_profesional in out tp_profesional) AS
 /**************************************************************************************************************
    NAME:       	pr_insertar_profesional
    PURPOSE		Inserta datos de profesional y usuario
@@ -76,18 +91,45 @@ CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
    1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
 ***************************************************************************************************************/
+    v_error_code NUMBER(10);
   BEGIN
+    BEGIN
+      v_error_code := 0;
+      INSERT INTO usuario (id_usuario,username, password, telefono, correo, id_rol)
+      VALUES(id_usuario_seq.NEXTVAL, p_profesional.username, p_profesional.password, p_profesional.telefono, p_profesional.correo, 2);
 
-    INSERT INTO usuario (id_usuario,username, password, telefono, correo, id_rol)
-    VALUES(id_usuario_seq.NEXTVAL, p_username, p_password, p_telefono, p_correo, 2);
+    EXCEPTION
+      WHEN DUP_VAL_ON_INDEX THEN
+        v_error_code := SQLCODE;
+    END;
+    if v_error_code = 0 THEN
+      INSERT INTO profesional (id_usuario, id_profesional, nombre, apellido_paterno, apellido_materno, rut, dv)
+      VALUES(id_usuario_seq.CURRVAL, id_profesional_seq.NEXTVAL, p_profesional.nombre, p_profesional.apellido_paterno, p_profesional.apellido_materno, p_profesional.rut, p_profesional.dv);
 
-    INSERT INTO profesional (id_usuario, id_profesional, nombre, apellido_paterno, apellido_materno, rut, dv)
-    VALUES(id_usuario_seq.CURRVAL, id_profesional_seq.NEXTVAL, p_nombre, p_apellido_paterno, p_apellido_materno, p_rut, p_dv);
+      pr_obtener_profesional(id_usuario_seq.CURRVAL,p_profesional);
+    end if;
 
-    pr_obtener_profesional(id_profesional_seq.CURRVAL, p_profesional);
   END;
 
-  PROCEDURE pr_eliminar_profesional(p_id_usuario in usuario.id_usuario%TYPE) AS
+  PROCEDURE pr_modificar_profesional(p_profesional OUT tp_profesional) AS
+  BEGIN
+    UPDATE usuario
+    SET username = p_profesional.username,
+        password = p_profesional.password,
+        telefono = p_profesional.telefono,
+        correo = p_profesional.correo
+    WHERE id_usuario = p_profesional.id_usuario;
+
+    UPDATE profesional
+    SET nombre = p_profesional.nombre,
+        apellido_paterno = p_profesional.apellido_paterno,
+        apellido_materno = p_profesional.apellido_materno,
+        rut = p_profesional.rut,
+        dv = p_profesional.dv
+    WHERE id_profesional = p_profesional.id_profesional;
+  END;
+
+  PROCEDURE pr_eliminar_profesional(p_profesional IN OUT tp_profesional) AS
   /**************************************************************************************************************
      NAME:       	pr_eliminar_profesional
        PURPOSE		Elimina datos de profesional y usuario
@@ -100,8 +142,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
   ***************************************************************************************************************/
 
   BEGIN
-    DELETE FROM profesional WHERE id_usuario = p_id_usuario;
-    DELETE FROM usuario WHERE id_usuario = p_id_usuario;
+    DELETE FROM profesional WHERE id_usuario = p_profesional.id_usuario;
+    DELETE FROM usuario WHERE id_usuario =  p_profesional.id_usuario;
   END;
 END pkg_profesional;
 /
@@ -1102,7 +1144,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_notificacion AS
   PROCEDURE pr_eliminar_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE) AS
   /**************************************************************************************************************
      NAME:      pr_eliminar_notificacion
-     PURPOSE		Elimina datos de notificacion segun su ID 
+     PURPOSE		Elimina datos de notificacion segun su ID
 
      REVISIONS:
      Ver          Date           Author                               Description

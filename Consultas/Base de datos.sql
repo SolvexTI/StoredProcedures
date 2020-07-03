@@ -188,11 +188,6 @@ CREATE TABLE usuario (
     id_rol       INTEGER NOT NULL
 );
 
-CREATE UNIQUE INDEX usuario__idx ON
-    usuario (
-        id_rol
-    ASC );
-
 ALTER TABLE usuario ADD CONSTRAINT usuario_pk PRIMARY KEY ( id_usuario );
 
 ALTER TABLE usuario ADD CONSTRAINT usuario__un UNIQUE ( username );

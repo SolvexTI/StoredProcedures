@@ -18,6 +18,22 @@ BEGIN
 END;
 /
 
+DECLARE
+
+    v_trabajador PKG_trabajador.tp_trabajador;
+BEGIN
+
+     v_trabajador.rut := 1;
+     v_trabajador.dv := '1';
+     v_trabajador.nombre := '1';
+     v_trabajador.apellido_paterno := '1';
+     v_trabajador.apellido_materno := '1';
+     v_trabajador.id_cliente := 1;
+     v_trabajador.dv := '1';
+     PKG_trabajador.pr_insertar_trabajador(v_trabajador);
+END;
+/
+
 desc ACTIVIDAD;
 
 DECLARE

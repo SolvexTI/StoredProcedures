@@ -41,8 +41,11 @@ INSERT INTO USUARIO VALUES(ID_USUARIO_SEQ.NEXTVAL, 'ES.DELPINO', 'ES.DELPINO', '
 INSERT INTO CLIENTE VALUES (ID_USUARIO_SEQ.CURRVAL, ID_CLIENTE_SEQ.NEXTVAL, 'DUOC UC', 'ANTONIO VARAS #666', 'EDUCACION', 1);
 COMMIT;
 
-/************************************INSERSION TABLA TIPO_ACTIVIDAD*************************************************/
+/************************************INSERSION TABLA TRABAJADOR*****************************************************/
 
+INSERT INTO TRABAJADOR VALUES(ID_TRABAJADOR_SEQ.NEXTVAL,19307652,'1','Alejandro', 'Del Pino', 'Acevedo', 1);
+
+/************************************INSERSION TABLA TIPO_ACTIVIDAD*************************************************/
 INSERT INTO TIPO_ACTIVIDAD VALUES(ID_TIPO_ACTIVIDAD_SEQ.NEXTVAL, 'Asesoria general');
 INSERT INTO TIPO_ACTIVIDAD VALUES(ID_TIPO_ACTIVIDAD_SEQ.NEXTVAL, 'Asesoria por accidente');
 INSERT INTO TIPO_ACTIVIDAD VALUES(ID_TIPO_ACTIVIDAD_SEQ.NEXTVAL, 'Asesoria por multa');
@@ -55,3 +58,6 @@ COMMIT;
 INSERT INTO ACTIVIDAD 
 VALUES (id_actividad_seq.NEXTVAL,'Asesoria General', 'Asesoria General', 'A',TO_DATE('05/06/2020', 'dd/mm/yyyy'), 'Sin resultado aun', 0, 1, 1, 1);
 COMMIT;
+
+
+

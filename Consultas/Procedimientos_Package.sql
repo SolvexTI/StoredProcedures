@@ -29,7 +29,17 @@ CREATE OR REPLACE PACKAGE pkg_profesional AS
 
   PROCEDURE pr_obtener_profesional(p_id_usuario IN profesional.id_usuario%TYPE,p_profesional OUT tp_profesional);
   PROCEDURE pr_obtener_profesionales(p_profesional OUT tb_profesional);
-  PROCEDURE pr_insertar_profesional(p_profesional IN OUT tp_profesional);
+  PROCEDURE pr_insertar_profesional(
+      p_username IN usuario.username%TYPE,
+      p_password IN usuario.password%TYPE,
+      p_telefono IN usuario.telefono%TYPE,
+      p_correo IN usuario.correo%TYPE,
+      p_nombre IN profesional.nombre%TYPE,
+      p_apellido_paterno IN profesional.apellido_paterno%TYPE,
+      p_apellido_materno IN profesional.apellido_materno%TYPE,
+      p_rut IN profesional.rut%TYPE,
+      p_dv IN profesional.dv%TYPE,
+      p_profesional OUT tp_profesional);
   PROCEDURE pr_modificar_profesional(p_profesional OUT tp_profesional);
   PROCEDURE pr_eliminar_profesional(p_profesional IN OUT tp_profesional);
 
@@ -56,6 +66,12 @@ CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
     p_profesional.id_profesional,p_profesional.nombre,p_profesional.apellido_paterno,p_profesional.apellido_materno,p_profesional.rut,p_profesional.dv
     FROM usuario JOIN profesional USING(id_usuario)
     WHERE id_usuario = p_id_usuario;
+
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      NULL;
+    WHEN TOO_MANY_ROWS THEN
+      NULL;
   END;
 
   PROCEDURE pr_obtener_profesionales(p_profesional OUT tb_profesional) AS
@@ -72,15 +88,30 @@ CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
     CURSOR profesional_cursor  IS
     SELECT id_usuario,username,password,telefono,correo,id_profesional,nombre,apellido_paterno,apellido_materno,rut,dv
     FROM usuario u JOIN profesional p USING(id_usuario);
+    v_error_code NUMBER(10);
   BEGIN
     OPEN profesional_cursor;
       LOOP
           FETCH profesional_cursor BULK COLLECT INTO p_profesional;
           EXIT WHEN profesional_cursor%NOTFOUND;
       END LOOP;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+          NULL;
+
   END;
 
-  PROCEDURE pr_insertar_profesional(p_profesional in out tp_profesional) AS
+  PROCEDURE pr_insertar_profesional(
+      p_username IN usuario.username%TYPE,
+      p_password IN usuario.password%TYPE,
+      p_telefono IN usuario.telefono%TYPE,
+      p_correo IN usuario.correo%TYPE,
+      p_nombre IN profesional.nombre%TYPE,
+      p_apellido_paterno IN profesional.apellido_paterno%TYPE,
+      p_apellido_materno IN profesional.apellido_materno%TYPE,
+      p_rut IN profesional.rut%TYPE,
+      p_dv IN profesional.dv%TYPE,
+      p_profesional OUT tp_profesional) AS
 /**************************************************************************************************************
    NAME:       	pr_insertar_profesional
    PURPOSE		Inserta datos de profesional y usuario
@@ -96,7 +127,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
     BEGIN
       v_error_code := 0;
       INSERT INTO usuario (id_usuario,username, password, telefono, correo, id_rol)
-      VALUES(id_usuario_seq.NEXTVAL, p_profesional.username, p_profesional.password, p_profesional.telefono, p_profesional.correo, 2);
+      VALUES(id_usuario_seq.NEXTVAL, p_username, p_password, p_telefono, p_correo, 2);
 
     EXCEPTION
       WHEN DUP_VAL_ON_INDEX THEN
@@ -104,8 +135,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
     END;
     if v_error_code = 0 THEN
       INSERT INTO profesional (id_usuario, id_profesional, nombre, apellido_paterno, apellido_materno, rut, dv)
-      VALUES(id_usuario_seq.CURRVAL, id_profesional_seq.NEXTVAL, p_profesional.nombre, p_profesional.apellido_paterno, p_profesional.apellido_materno, p_profesional.rut, p_profesional.dv);
-
+      VALUES(id_usuario_seq.CURRVAL, id_profesional_seq.NEXTVAL, p_nombre, p_apellido_paterno, p_apellido_materno, p_rut, p_dv);
       pr_obtener_profesional(id_usuario_seq.CURRVAL,p_profesional);
     end if;
 
@@ -113,13 +143,18 @@ CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
 
   PROCEDURE pr_modificar_profesional(p_profesional OUT tp_profesional) AS
   BEGIN
-    UPDATE usuario
-    SET username = p_profesional.username,
-        password = p_profesional.password,
-        telefono = p_profesional.telefono,
-        correo = p_profesional.correo
-    WHERE id_usuario = p_profesional.id_usuario;
+    BEGIN
+        UPDATE usuario
+        SET username = p_profesional.username,
+            password = p_profesional.password,
+            telefono = p_profesional.telefono,
+            correo = p_profesional.correo
+            WHERE id_usuario = p_profesional.id_usuario;
+        EXCEPTION
+          WHEN DUP_VAL_ON_INDEX THEN
+            NULL;
 
+    END;
     UPDATE profesional
     SET nombre = p_profesional.nombre,
         apellido_paterno = p_profesional.apellido_paterno,
@@ -288,7 +323,19 @@ CREATE  OR REPLACE PACKAGE pkg_actividad AS
     p_actividad out tp_actividad
   );
   PROCEDURE pr_eliminar_actividad(p_id_actividad actividad.id_actividad%TYPE);
-  PROCEDURE pr_modificar_actividad(p_actividad in out tp_actividad);
+  PROCEDURE pr_modificar_actividad(
+    p_id_actividad in actividad.id_actividad%TYPE
+    p_nombre in actividad.nombre%type,
+    p_descripcion in actividad.descripcion%type,
+    p_estado in actividad.estado%type,
+    p_fecha_inicio in actividad.fecha_inicio%type,
+    p_resultado in actividad.resultado%type,
+    p_cantidad_modificaciones in actividad.cantidad_modificaciones%type,
+    p_id_profesional in actividad.id_profesional%type,
+    p_id_cliente in actividad.id_cliente%type,
+    p_tipo_actividad in tipo_actividad.nombre%type,
+    p_actividad out tp_actividad
+  );
 
 END pkg_actividad;
 /
@@ -424,7 +471,18 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
     DELETE actividad WHERE id_actividad = p_id_actividad;
   END;
 
-  PROCEDURE pr_modificar_actividad(p_actividad in out tp_actividad) AS
+  PROCEDURE pr_modificar_actividad(
+    p_id_actividad in actividad.id_actividad%TYPE
+    p_nombre in actividad.nombre%type,
+    p_descripcion in actividad.descripcion%type,
+    p_estado in actividad.estado%type,
+    p_fecha_inicio in actividad.fecha_inicio%type,
+    p_resultado in actividad.resultado%type,
+    p_cantidad_modificaciones in actividad.cantidad_modificaciones%type,
+    p_id_profesional in actividad.id_profesional%type,
+    p_id_cliente in actividad.id_cliente%type,
+    p_tipo_actividad in tipo_actividad.nombre%type,
+    p_actividad out tp_actividad) AS
   /**************************************************************************************************************
      NAME:      pr_modificar_actividad
      PURPOSE		Modifica actividad segun su ID
@@ -437,18 +495,18 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
   ***************************************************************************************************************/
     v_id_tipo_actividad tipo_actividad.id_tipo_actividad%TYPE;
   BEGIN
-    SELECT id_tipo_actividad INTO v_id_tipo_actividad FROM tipo_actividad WHERE nombre LIKE p_actividad.tipo_actividad;
+    SELECT id_tipo_actividad INTO v_id_tipo_actividad FROM tipo_actividad WHERE nombre LIKE p_tipo_actividad;
     UPDATE actividad
-    SET nombre = p_actividad.nombre,
-        descripcion = p_actividad.descripcion,
-        estado = p_actividad.estado,
-        fecha_inicio = p_actividad.fecha_inicio,
-        resultado = p_actividad.resultado,
-        cantidad_modificaciones = p_actividad.cantidad_modificaciones,
-        id_profesional = p_actividad.id_profesional,
-        id_cliente = p_actividad.id_cliente,
+    SET nombre = p_nombre,
+        descripcion = p_descripcion,
+        estado = p_estado,
+        fecha_inicio = p_fecha_inicio,
+        resultado = p_resultado,
+        cantidad_modificaciones = p_cantidad_modificaciones,
+        id_profesional = p_id_profesional,
+        id_cliente = p_id_cliente,
         id_tipo_actividad = v_id_tipo_actividad
-    WHERE id_actividad = p_actividad.id_actividad;
+    WHERE id_actividad = p_id_actividad;
   END;
 END pkg_actividad;
 /

@@ -1,6 +1,3 @@
-create user SOLVEX identified by solv3x;
-grant dba to SOLVEX;
-commit;
 ALTER SESSION SET CURRENT_SCHEMA = SOLVEX;
 
 CREATE TABLE actividad (

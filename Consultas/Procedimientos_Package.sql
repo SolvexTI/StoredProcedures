@@ -296,7 +296,7 @@ CREATE  OR REPLACE PACKAGE pkg_actividad AS
     nombre                  VARCHAR2(100),
     descripcion             VARCHAR2(600),
     estado                  CHAR(1),
-    fecha_inicio            DATE,
+    fecha_inicio            NUMBER(38),
     resultado               VARCHAR2(600),
     cantidad_modificaciones NUMBER(38),
     id_profesional          NUMBER(38),
@@ -761,9 +761,9 @@ END pkg_plan;
 CREATE OR REPLACE PACKAGE pkg_contrato AS
   TYPE tp_contrato IS RECORD (
     id_contrato        NUMBER(38),
-    fecha_inicio       DATE,
-    fecha_termino      DATE,
-    fecha_facturacion  DATE,
+    fecha_inicio       NUMBER(38),
+    fecha_termino      NUMBER(38),
+    fecha_facturacion  NUMBER(38),
     id_cliente         NUMBER(38),
     id_plan            NUMBER(38)
   );
@@ -991,7 +991,7 @@ CREATE OR REPLACE PACKAGE pkg_incidente AS
 
   TYPE tp_incidente IS RECORD (
     id_incidente  NUMBER(38),
-    fecha         DATE,
+    fecha         NUMBER(38),
     descripcion   VARCHAR2(600)
   );
 
@@ -1126,7 +1126,7 @@ CREATE OR REPLACE PACKAGE pkg_notificacion AS
   TYPE tp_notificacion IS RECORD (
     id_notificacion  NUMBER(38),
     mensaje          VARCHAR2(1000),
-    hora             DATE,
+    hora             NUMBER(38),
     id_usuario       NUMBER(38)
   );
 

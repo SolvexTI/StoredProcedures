@@ -324,7 +324,7 @@ CREATE  OR REPLACE PACKAGE pkg_actividad AS
   );
   PROCEDURE pr_eliminar_actividad(p_id_actividad actividad.id_actividad%TYPE);
   PROCEDURE pr_modificar_actividad(
-    p_id_actividad in actividad.id_actividad%TYPE
+    p_id_actividad in actividad.id_actividad%TYPE,
     p_nombre in actividad.nombre%type,
     p_descripcion in actividad.descripcion%type,
     p_estado in actividad.estado%type,

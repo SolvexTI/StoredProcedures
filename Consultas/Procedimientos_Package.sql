@@ -41,7 +41,7 @@ CREATE OR REPLACE PACKAGE pkg_profesional AS
       p_dv IN profesional.dv%TYPE,
       p_profesional OUT tp_profesional);
   PROCEDURE pr_modificar_profesional(p_profesional OUT tp_profesional);
-  PROCEDURE pr_eliminar_profesional(p_profesional IN OUT tp_profesional);
+  PROCEDURE pr_eliminar_profesional(p_profesional IN tp_profesional);
 
 END pkg_profesional;
 /
@@ -164,7 +164,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
     WHERE id_profesional = p_profesional.id_profesional;
   END;
 
-  PROCEDURE pr_eliminar_profesional(p_profesional IN OUT tp_profesional) AS
+  PROCEDURE pr_eliminar_profesional(p_profesional IN tp_profesional) AS
   /**************************************************************************************************************
      NAME:       	pr_eliminar_profesional
        PURPOSE		Elimina datos de profesional y usuario
@@ -324,7 +324,7 @@ CREATE  OR REPLACE PACKAGE pkg_actividad AS
   );
   PROCEDURE pr_eliminar_actividad(p_id_actividad actividad.id_actividad%TYPE);
   PROCEDURE pr_modificar_actividad(
-    p_id_actividad in actividad.id_actividad%TYPE
+    p_id_actividad in actividad.id_actividad%TYPE,
     p_nombre in actividad.nombre%type,
     p_descripcion in actividad.descripcion%type,
     p_estado in actividad.estado%type,
@@ -472,7 +472,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
   END;
 
   PROCEDURE pr_modificar_actividad(
-    p_id_actividad in actividad.id_actividad%TYPE
+    p_id_actividad in actividad.id_actividad%TYPE,
     p_nombre in actividad.nombre%type,
     p_descripcion in actividad.descripcion%type,
     p_estado in actividad.estado%type,
@@ -665,9 +665,15 @@ CREATE OR REPLACE PACKAGE pkg_plan AS
 
   PROCEDURE pr_obtener_plan(p_id_plan plan.id_plan%TYPE, p_plan OUT tp_plan);
   PROCEDURE pr_obtener_planes ( p_plan OUT tb_plan);
-  PROCEDURE pr_insertar_plan (p_plan IN OUT tp_plan);
+  PROCEDURE pr_insertar_plan (
+            p_id_plan plan.id_plan%type,
+            p_valor plan.valor%type,
+            p_descripcion plan.descripcion%type,
+            p_plan OUT tp_plan);
   PROCEDURE pr_eliminar_plan (p_id_plan plan.id_plan%TYPE);
-  PROCEDURE pr_modificar_plan (p_plan IN OUT tp_plan);
+  PROCEDURE pr_modificar_plan (
+            p_id_plan plan.id_plan%TYPE,
+            p_plan OUT tp_plan);
 
 END pkg_plan;
 /
@@ -714,7 +720,11 @@ CREATE OR REPLACE PACKAGE BODY pkg_plan AS
   END;
 
 
-  PROCEDURE pr_insertar_plan (p_plan IN OUT tp_plan) AS
+  PROCEDURE pr_insertar_plan (
+            p_id_plan plan.id_plan%type,
+            p_valor plan.valor%type,
+            p_descripcion plan.descripcion%type,
+            p_plan OUT tp_plan) AS
   /**************************************************************************************************************
      NAME:      pr_insertar_plan
      PURPOSE		Inserta datos de un plan y devuelve el tipo tp_plan

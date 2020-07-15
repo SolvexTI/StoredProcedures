@@ -16,5 +16,6 @@ ALTER TABLE boleta MODIFY fecha_pago NUMBER;
 ALTER TABLE cargo_extra MODIFY fecha NUMBER;
 ALTER TABLE contrato MODIFY fecha_inicio NUMBER;
 ALTER TABLE contrato MODIFY fecha_termino NUMBER;
+ALTER TABLE contrato MODIFY fecha_facturacion NUMBER;
 ALTER TABLE incidente MODIFY fecha NUMBER;
 ALTER TABLE notificacion MODIFY hora NUMBER;

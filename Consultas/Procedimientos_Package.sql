@@ -666,13 +666,14 @@ CREATE OR REPLACE PACKAGE pkg_plan AS
   PROCEDURE pr_obtener_plan(p_id_plan plan.id_plan%TYPE, p_plan OUT tp_plan);
   PROCEDURE pr_obtener_planes ( p_plan OUT tb_plan);
   PROCEDURE pr_insertar_plan (
-            p_id_plan plan.id_plan%type,
             p_valor plan.valor%type,
             p_descripcion plan.descripcion%type,
             p_plan OUT tp_plan);
   PROCEDURE pr_eliminar_plan (p_id_plan plan.id_plan%TYPE);
   PROCEDURE pr_modificar_plan (
             p_id_plan plan.id_plan%TYPE,
+            p_valor plan.valor%type,
+            p_descripcion plan.descripcion%type,
             p_plan OUT tp_plan);
 
 END pkg_plan;
@@ -721,7 +722,6 @@ CREATE OR REPLACE PACKAGE BODY pkg_plan AS
 
 
   PROCEDURE pr_insertar_plan (
-            p_id_plan plan.id_plan%type,
             p_valor plan.valor%type,
             p_descripcion plan.descripcion%type,
             p_plan OUT tp_plan) AS
@@ -737,7 +737,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_plan AS
   ***************************************************************************************************************/
   BEGIN
     INSERT INTO plan (id_plan,valor,descripcion)
-    VALUES (id_plan_seq.NEXTVAL,p_plan.valor,p_plan.descripcion);
+    VALUES (id_plan_seq.NEXTVAL,p_valor,p_descripcion);
   END;
 
   PROCEDURE pr_eliminar_plan (p_id_plan plan.id_plan%TYPE) AS
@@ -755,15 +755,17 @@ CREATE OR REPLACE PACKAGE BODY pkg_plan AS
     DELETE FROM plan WHERE id_plan = p_id_plan;
   END;
 
-  PROCEDURE pr_modificar_plan (p_plan IN OUT tp_plan) AS
+  PROCEDURE pr_modificar_plan (
+            p_id_plan plan.id_plan%TYPE,
+            p_valor plan.valor%type,
+            p_descripcion plan.descripcion%type,
+            p_plan OUT tp_plan) AS
   BEGIN
     UPDATE plan
-    SET valor = p_plan.valor,
-        descripcion = p_plan.descripcion
+    SET valor = p_valor,
+        descripcion = p_descripcion
     WHERE id_plan = p_plan.id_plan;
   END;
-
-
 END pkg_plan;
 /
 
@@ -781,9 +783,22 @@ CREATE OR REPLACE PACKAGE pkg_contrato AS
   TYPE tb_contrato IS TABLE OF tp_contrato;
 
   PROCEDURE pr_obtener_contrato(p_id_cliente cliente.id_usuario%TYPE,p_contrato OUT tp_contrato);
-  PROCEDURE pr_insertar_contrato(p_contrato IN OUT tp_contrato);
+  PROCEDURE pr_insertar_contrato(
+            p_fecha_inicio contrato.fecha_inicio%TYPE,
+            p_fecha_termino contrato.fecha_termino%TYPE,
+            p_fecha_facturacion contrato.fecha_facturacion%TYPE,
+            p_id_cliente contrato.id_cliente%TYPE,
+            p_id_plan contrato.id_plan%TYPE,
+            p_contrato OUT tp_contrato);
   PROCEDURE pr_eliminar_contrato(p_id_cliente cliente.id_usuario%TYPE);
-  PROCEDURE pr_modificar_contrato(p_contrato IN OUT tp_contrato);
+  PROCEDURE pr_modificar_contrato(
+            p_id_contrato contrato.id_contrato%TYPE,
+            p_fecha_inicio contrato.fecha_inicio%TYPE,
+            p_fecha_termino contrato.fecha_termino%TYPE,
+            p_fecha_facturacion contrato.fecha_facturacion%TYPE,
+            p_id_cliente contrato.id_cliente%TYPE,
+            p_id_plan contrato.id_plan%TYPE,
+            p_contrato OUT tp_contrato);
 END pkg_contrato;
 /
 CREATE OR REPLACE PACKAGE BODY pkg_contrato AS
@@ -806,7 +821,13 @@ CREATE OR REPLACE PACKAGE BODY pkg_contrato AS
     WHERE p_id_cliente = p_id_cliente;
   END;
 
-  PROCEDURE pr_insertar_contrato(p_contrato IN OUT tp_contrato) AS
+  PROCEDURE pr_insertar_contrato(
+            p_fecha_inicio contrato.fecha_inicio%TYPE,
+            p_fecha_termino contrato.fecha_termino%TYPE,
+            p_fecha_facturacion contrato.fecha_facturacion%TYPE,
+            p_id_cliente contrato.id_cliente%TYPE,
+            p_id_plan contrato.id_plan%TYPE,
+            p_contrato OUT tp_contrato) AS
   /**************************************************************************************************************
      NAME:      pr_insertar_contrato
      PURPOSE	  Inserta datos de contrato y devuelve tipos de tp_contrato
@@ -837,15 +858,22 @@ CREATE OR REPLACE PACKAGE BODY pkg_contrato AS
     DELETE FROM contrato WHERE id_cliente = p_id_cliente;
   END;
 
-  PROCEDURE pr_modificar_contrato(p_contrato IN OUT tp_contrato) AS
+  PROCEDURE pr_modificar_contrato(
+            p_id_contrato contrato.id_contrato%TYPE,
+            p_fecha_inicio contrato.fecha_inicio%TYPE,
+            p_fecha_termino contrato.fecha_termino%TYPE,
+            p_fecha_facturacion contrato.fecha_facturacion%TYPE,
+            p_id_cliente contrato.id_cliente%TYPE,
+            p_id_plan contrato.id_plan%TYPE,
+            p_contrato OUT tp_contrato) AS
   BEGIN
     UPDATE contrato
-    SET fecha_inicio = p_contrato.fecha_inicio,
-        fecha_termino = p_contrato.fecha_termino,
-        fecha_facturacion = p_contrato.fecha_facturacion,
-        id_cliente = p_contrato.id_cliente,
-        id_plan = p_contrato.id_plan
-    WHERE id_contrato = p_contrato.id_contrato;
+    SET fecha_inicio = p_fecha_inicio,
+        fecha_termino = p_fecha_termino,
+        fecha_facturacion = p_fecha_facturacion,
+        id_cliente = p_id_cliente,
+        id_plan = p_id_plan
+    WHERE id_contrato = p_id_contrato;
   END;
 END pkg_contrato;
 /
@@ -866,10 +894,25 @@ CREATE OR REPLACE PACKAGE pkg_trabajador AS
   PROCEDURE pr_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p_trabajador OUT tp_trabajador) ;
   PROCEDURE pr_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE, p_trabajador OUT tb_trabajador);
   PROCEDURE pr_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE, p_trabajador OUT tb_trabajador);
-  PROCEDURE pr_insertar_trabajador(p_trabajador IN OUT tp_trabajador);
+  PROCEDURE pr_insertar_trabajador(
+            p_rut trabajador.rut%TYPE,
+            p_dv trabajador.dv%TYPE,
+            p_nombre trabajador.nombre%TYPE,
+            p_apellido_paterno trabajador.apellido_paterno%TYPE,
+            p_apellido_materno trabajador.apellido_materno%TYPE,
+            p_id_cliente trabajador.id_cliente%TYPE,
+            p_trabajador OUT tp_trabajador);
   PROCEDURE pr_insertar_trabajador_actividad(p_id_trabajador trabajador.id_trabajador%TYPE, p_id_actividad actividad.id_actividad%TYPE);
   PROCEDURE pr_eliminar_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE);
-  PROCEDURE pr_modificar_trabajador(p_trabajador IN OUT tp_trabajador);
+  PROCEDURE pr_modificar_trabajador(
+            p_id_trabajador trabajador.id_trabajador%TYPE,
+            p_rut trabajador.rut%TYPE,
+            p_dv trabajador.dv%TYPE,
+            p_nombre trabajador.nombre%TYPE,
+            p_apellido_paterno trabajador.apellido_paterno%TYPE,
+            p_apellido_materno trabajador.apellido_materno%TYPE,
+            p_id_cliente trabajador.id_cliente%TYPE,
+            p_trabajador OUT tp_trabajador);
 END pkg_trabajador;
 /
 CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
@@ -938,7 +981,14 @@ PROCEDURE pr_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p
       END LOOP;
   END;
 
-  PROCEDURE pr_insertar_trabajador(p_trabajador IN OUT tp_trabajador) AS
+  PROCEDURE pr_insertar_trabajador(
+            p_rut trabajador.rut%TYPE,
+            p_dv trabajador.dv%TYPE,
+            p_nombre trabajador.nombre%TYPE,
+            p_apellido_paterno trabajador.apellido_paterno%TYPE,
+            p_apellido_materno trabajador.apellido_materno%TYPE,
+            p_id_cliente trabajador.id_cliente%TYPE,
+            p_trabajador OUT tp_trabajador) AS
   /**************************************************************************************************************
      NAME:      pr_insertar_trabajador
      PURPOSE		Inserta datos de Trabajador y devuelve tipo tp_trabajador
@@ -951,7 +1001,7 @@ PROCEDURE pr_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p
   ***************************************************************************************************************/
   BEGIN
     INSERT INTO trabajador (id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente)
-    VALUES (id_trabajador_seq.NEXTVAL,p_trabajador.rut,p_trabajador.dv,p_trabajador.nombre,p_trabajador.apellido_paterno,p_trabajador.apellido_materno,p_trabajador.id_cliente);
+    VALUES (id_trabajador_seq.NEXTVAL,p_rut,p_dv,p_nombre,p_apellido_paterno,p_apellido_materno,p_id_cliente);
   END;
 
   PROCEDURE pr_insertar_trabajador_actividad(p_id_trabajador trabajador.id_trabajador%TYPE, p_id_actividad actividad.id_actividad%TYPE) AS
@@ -973,7 +1023,15 @@ PROCEDURE pr_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p
   BEGIN
     DELETE FROM trabajador WHERE id_trabajador = p_id_trabajador;
   END;
-  PROCEDURE pr_modificar_trabajador(p_trabajador IN OUT tp_trabajador) AS
+  PROCEDURE pr_modificar_trabajador(
+            p_id_trabajador trabajador.id_trabajador%TYPE,
+            p_rut trabajador.rut%TYPE,
+            p_dv trabajador.dv%TYPE,
+            p_nombre trabajador.nombre%TYPE,
+            p_apellido_paterno trabajador.apellido_paterno%TYPE,
+            p_apellido_materno trabajador.apellido_materno%TYPE,
+            p_id_cliente trabajador.id_cliente%TYPE,
+            p_trabajador OUT tp_trabajador) AS
   /**************************************************************************************************************
      NAME:      r_modificar_trabajador
      PURPOSE		Modifica datos de trabajador segun ID
@@ -986,13 +1044,13 @@ PROCEDURE pr_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p
   ***************************************************************************************************************/
   BEGIN
     UPDATE trabajador
-    SET rut = p_trabajador.rut,
-        dv = p_trabajador.dv,
-        nombre = p_trabajador.nombre,
-        apellido_paterno = p_trabajador.apellido_paterno,
-        apellido_materno = p_trabajador.apellido_materno,
-        id_cliente = p_trabajador.id_cliente
-    WHERE id_trabajador = p_trabajador.id_trabajador;
+    SET rut = p_rut,
+        dv = p_dv,
+        nombre = p_nombre,
+        apellido_paterno = p_apellido_paterno,
+        apellido_materno = p_apellido_materno,
+        id_cliente = p_id_cliente
+    WHERE id_trabajador = p_id_trabajador;
   END;
 END pkg_trabajador;
 /
@@ -1010,9 +1068,17 @@ CREATE OR REPLACE PACKAGE pkg_incidente AS
   PROCEDURE pr_obtener_incidente(p_id_incidente incidente.id_incidente%TYPE, p_incidente OUT tp_incidente);
   PROCEDURE pr_obtener_incidente_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p_incidente OUT tb_incidente);
   PROCEDURE pr_obtener_incidente_cliente(p_id_cliente cliente.id_cliente%TYPE, p_incidente OUT tb_incidente);
-  PROCEDURE pr_insertar_incidente(p_incidente IN OUT tp_incidente, p_id_trabajador trabajador.id_trabajador%TYPE);
+  PROCEDURE pr_insertar_incidente(
+            p_fecha incidente.fecha%TYPE,
+            p_descripcion incidente.descripcion%TYPE,
+            p_incidente OUT tp_incidente,
+            p_id_trabajador trabajador.id_trabajador%TYPE);
   PROCEDURE pr_eliminar_incidente(p_id_incidente incidente.id_incidente%TYPE);
-  PROCEDURE pr_modificar_incidente(p_incidente IN OUT tp_incidente);
+  PROCEDURE pr_modificar_incidente(
+            p_id_incidente incidente.id_incidente%TYPE,
+            p_fecha incidente.fecha%TYPE,
+            p_descripcion incidente.descripcion%TYPE,
+            p_incidente OUT tp_incidente);
 
 
 END;
@@ -1080,7 +1146,11 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
           EXIT WHEN incidente_cursor%NOTFOUND;
       END LOOP;
   END;
-  PROCEDURE pr_insertar_incidente(p_incidente IN OUT tp_incidente, p_id_trabajador trabajador.id_trabajador%TYPE) AS
+  PROCEDURE pr_insertar_incidente(
+            p_fecha incidente.fecha%TYPE,
+            p_descripcion incidente.descripcion%TYPE,
+            p_incidente OUT tp_incidente,
+            p_id_trabajador trabajador.id_trabajador%TYPE) AS
   /**************************************************************************************************************
      NAME:      pr_insertar_incidente
      PURPOSE	  Inserta datos de incidente y devuelve tipo tp_incidente
@@ -1093,7 +1163,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
   ***************************************************************************************************************/
   BEGIN
     INSERT INTO incidente (id_incidente, fecha, descripcion)
-    VALUES(id_incidente_seq.NEXTVAL, p_incidente.fecha, p_incidente.descripcion);
+    VALUES(id_incidente_seq.NEXTVAL, p_fecha, p_descripcion);
     INSERT INTO trabajador_incidente VALUES(p_id_trabajador, id_incidente_seq.CURRVAL);
   END;
   PROCEDURE pr_eliminar_incidente(p_id_incidente incidente.id_incidente%TYPE) AS
@@ -1110,7 +1180,11 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
   BEGIN
     DELETE FROM incidente WHERE id_incidente = p_id_incidente;
   END;
-  PROCEDURE pr_modificar_incidente(p_incidente IN OUT tp_incidente) AS
+  PROCEDURE pr_modificar_incidente(
+            p_id_incidente incidente.id_incidente%TYPE,
+            p_fecha incidente.fecha%TYPE,
+            p_descripcion incidente.descripcion%TYPE,
+            p_incidente OUT tp_incidente) AS
   /**************************************************************************************************************
      NAME:      pr_modificar_incidente
      PURPOSE	  Modifica datos de incidente
@@ -1123,11 +1197,10 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
   ***************************************************************************************************************/
   BEGIN
     UPDATE incidente
-    SET fecha = p_incidente.fecha,
-        descripcion = p_incidente.descripcion
-    WHERE id_incidente = p_incidente.id_incidente;
+    SET fecha = p_fecha,
+        descripcion = p_descripcion
+    WHERE id_incidente = p_id_incidente;
   END;
-
 END;
 /
 
@@ -1144,7 +1217,11 @@ CREATE OR REPLACE PACKAGE pkg_notificacion AS
 
   PROCEDURE pr_obtener_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE, p_notificacion OUT tp_notificacion);
   PROCEDURE pr_obtener_notificacion_usuario(p_id_usuario notificacion.id_usuario%TYPE,  p_notificacion OUT tb_notificacion) ;
-  PROCEDURE pr_insertar_notificacion(p_notificacion IN OUT tp_notificacion);
+  PROCEDURE pr_insertar_notificacion(
+            p_mensaje notificacion.mensaje%TYPE,
+            p_hora notificacion.hora%TYPE,
+            p_id_usuario notificacion.id_usuario%TYPE,
+            p_notificacion OUT tp_notificacion);
   PROCEDURE pr_eliminar_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE);
 
 END;
@@ -1193,7 +1270,11 @@ CREATE OR REPLACE PACKAGE BODY pkg_notificacion AS
       END LOOP;
   END;
 
-  PROCEDURE pr_insertar_notificacion(p_notificacion IN OUT tp_notificacion) AS
+  PROCEDURE pr_insertar_notificacion(
+            p_mensaje notificacion.mensaje%TYPE,
+            p_hora notificacion.hora%TYPE,
+            p_id_usuario notificacion.id_usuario%TYPE,
+            p_notificacion OUT tp_notificacion) AS
   /**************************************************************************************************************
      NAME:      pr_insertar_notificacion
      PURPOSE		Inserta datos de una notificacion
@@ -1209,7 +1290,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_notificacion AS
     VALUES (id_notificacion_seq.NEXTVAL,p_notificacion.mensaje,p_notificacion.hora,p_notificacion.id_usuario);
   END;
 
-  PROCEDURE pr_eliminar_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE) AS
+  PROCEDURE pr_eliminar_notificacion(
+  p_id_notificacion notificacion.id_notificacion%TYPE) AS
   /**************************************************************************************************************
      NAME:      pr_eliminar_notificacion
      PURPOSE		Elimina datos de notificacion segun su ID

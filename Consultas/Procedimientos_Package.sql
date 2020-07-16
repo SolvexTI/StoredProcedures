@@ -301,7 +301,7 @@ CREATE  OR REPLACE PACKAGE pkg_actividad AS
     cantidad_modificaciones NUMBER(38),
     id_profesional          NUMBER(38),
     id_cliente              NUMBER(38),
-    tipo_actividad          VARCHAR2(80)
+    id_tipo_actividad       NUMBER(38)
 
   );
 
@@ -319,7 +319,7 @@ CREATE  OR REPLACE PACKAGE pkg_actividad AS
     p_cantidad_modificaciones in actividad.cantidad_modificaciones%type,
     p_id_profesional in actividad.id_profesional%type,
     p_id_cliente in actividad.id_cliente%type,
-    p_tipo_actividad in tipo_actividad.nombre%type,
+    p_id_tipo_actividad in actividad.id_tipo_actividad%type,
     p_actividad out tp_actividad
   );
   PROCEDURE pr_eliminar_actividad(p_id_actividad actividad.id_actividad%TYPE);
@@ -333,7 +333,7 @@ CREATE  OR REPLACE PACKAGE pkg_actividad AS
     p_cantidad_modificaciones in actividad.cantidad_modificaciones%type,
     p_id_profesional in actividad.id_profesional%type,
     p_id_cliente in actividad.id_cliente%type,
-    p_tipo_actividad in tipo_actividad.nombre%type,
+    p_id_tipo_actividad in actividad.id_tipo_actividad%type,
     p_actividad out tp_actividad
   );
 
@@ -353,8 +353,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
 
   ***************************************************************************************************************/
   BEGIN
-    SELECT id_actividad,a.nombre,descripcion,estado,fecha_inicio,resultado,cantidad_modificaciones,id_profesional,id_cliente,ta.nombre tipo_actividad
-    INTO p_actividad.id_actividad,p_actividad.nombre,p_actividad.descripcion,p_actividad.estado,p_actividad.fecha_inicio,p_actividad.resultado,p_actividad.cantidad_modificaciones,p_actividad.id_profesional,p_actividad.id_cliente,p_actividad.tipo_actividad
+    SELECT id_actividad,a.nombre,descripcion,estado,fecha_inicio,resultado,cantidad_modificaciones,id_profesional,id_cliente,id_tipo_actividad
+    INTO p_actividad.id_actividad,p_actividad.nombre,p_actividad.descripcion,p_actividad.estado,p_actividad.fecha_inicio,p_actividad.resultado,p_actividad.cantidad_modificaciones,p_actividad.id_profesional,p_actividad.id_cliente,p_actividad.id_tipo_actividad
     FROM actividad a join tipo_actividad ta USING(id_tipo_actividad)
     WHERE id_actividad = p_id_actividad;
   END;
@@ -417,7 +417,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
     p_cantidad_modificaciones in actividad.cantidad_modificaciones%type,
     p_id_profesional in actividad.id_profesional%type,
     p_id_cliente in actividad.id_cliente%type,
-    p_tipo_actividad in tipo_actividad.nombre%type,
+    p_id_tipo_actividad in actividad.id_tipo_actividad%type,
     p_actividad out tp_actividad
   ) AS
     /**************************************************************************************************************
@@ -430,9 +430,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
        1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
     ***************************************************************************************************************/
-    v_id_tipo_actividad tipo_actividad.id_tipo_actividad%TYPE;
   BEGIN
-    SELECT id_tipo_actividad INTO v_id_tipo_actividad FROM tipo_actividad WHERE UPPER(nombre) LIKE UPPER(p_tipo_actividad);
     INSERT INTO actividad (id_actividad,
                            nombre,
                            descripcion,
@@ -452,7 +450,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
                            p_cantidad_modificaciones,
                            p_id_profesional,
                            p_id_cliente,
-                           v_id_tipo_actividad);
+                           p_id_tipo_actividad);
     pr_obtener_actividad(id_actividad_seq.CURRVAL, p_actividad);
   END;
 
@@ -481,7 +479,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
     p_cantidad_modificaciones in actividad.cantidad_modificaciones%type,
     p_id_profesional in actividad.id_profesional%type,
     p_id_cliente in actividad.id_cliente%type,
-    p_tipo_actividad in tipo_actividad.nombre%type,
+    p_id_tipo_actividad in actividad.id_tipo_actividad%type,
     p_actividad out tp_actividad) AS
   /**************************************************************************************************************
      NAME:      pr_modificar_actividad
@@ -493,9 +491,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
      1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
   ***************************************************************************************************************/
-    v_id_tipo_actividad tipo_actividad.id_tipo_actividad%TYPE;
   BEGIN
-    SELECT id_tipo_actividad INTO v_id_tipo_actividad FROM tipo_actividad WHERE nombre LIKE p_tipo_actividad;
     UPDATE actividad
     SET nombre = p_nombre,
         descripcion = p_descripcion,
@@ -505,10 +501,67 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
         cantidad_modificaciones = p_cantidad_modificaciones,
         id_profesional = p_id_profesional,
         id_cliente = p_id_cliente,
-        id_tipo_actividad = v_id_tipo_actividad
+        id_tipo_actividad = p_id_tipo_actividad
     WHERE id_actividad = p_id_actividad;
   END;
 END pkg_actividad;
+/
+
+CREATE OR REPLACE PACKAGE pkg_tipo_actividad AS
+  TYPE tp_tipo_actividad IS RECORD (
+    id_tipo_actividad NUMBER(38),
+    nombre            VARCHAR2(80)
+  );
+
+  TYPE tb_tipo_actividad IS TABLE OF tp_tipo_actividad;
+  PROCEDURE pr_obtener_tipo_actividades(p_tipo_actividad OUT tb_tipo_actividad);
+  PROCEDURE pr_obtener_tipo_actividad(p_id_tipo_actividad tipo_actividad.id_tipo_actividad%TYPE, p_tipo_actividad OUT tp_tipo_actividad);
+
+END pkg_tipo_actividad;
+/
+
+CREATE OR REPLACE PACKAGE BODY pkg_tipo_actividad AS
+
+  PROCEDURE pr_obtener_tipo_actividades(p_tipo_actividad OUT tb_tipo_actividad) AS
+  /**************************************************************************************************************
+     NAME:      pr_obtener_tipo_actividades
+     PURPOSE		Obtiene todos los tipos de actividad en el sistema segun trabajador y devuelve tipo tabla tb_incidente
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
+    CURSOR tipo_actividad_cursor IS
+    SELECT id_tipo_actividad, nombre
+    FROM tipo_actividad;
+  BEGIN
+    OPEN tipo_actividad_cursor;
+      LOOP
+          FETCH tipo_actividad_cursor BULK COLLECT INTO p_tipo_actividad;
+          EXIT WHEN tipo_actividad_cursor%NOTFOUND;
+      END LOOP;
+  END;
+
+  PROCEDURE pr_obtener_tipo_actividad(p_id_tipo_actividad tipo_actividad.id_tipo_actividad%TYPE, p_tipo_actividad OUT tp_tipo_actividad) AS
+  /**************************************************************************************************************
+     NAME:      pr_obtener_tipo_actividades
+     PURPOSE		Obtiene tipo de actividad en el sistema segun su id
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
+    BEGIN
+      SELECT id_tipo_actividad, nombre
+      INTO p_tipo_actividad.id_tipo_actividad, p_tipo_actividad.nombre
+      FROM tipo_actividad
+      WHERE id_tipo_actividad = p_id_tipo_actividad;
+    END;
+END pkg_tipo_actividad;
 /
 
 CREATE OR REPLACE PACKAGE pkg_punto_mejorable AS

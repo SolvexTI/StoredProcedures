@@ -74,3 +74,7 @@ END;
 
   SELECT username,password,telefono,correo,id_profesional,nombre,apellido_paterno,apellido_materno,rut,dv
     FROM usuario u JOIN profesional p USING(id_usuario);
+
+
+
+DESC TIPO_ACTIVIDAD;

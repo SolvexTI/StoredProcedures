@@ -56,7 +56,7 @@ COMMIT;
 
 
 INSERT INTO ACTIVIDAD 
-VALUES (id_actividad_seq.NEXTVAL,'Asesoria General', 'Asesoria General', 'A',TO_DATE('05/06/2020', 'dd/mm/yyyy'), 'Sin resultado aun', 0, 1, 1, 1);
+VALUES (id_actividad_seq.NEXTVAL,'Asesoria General', 'Asesoria General', 'A',0, 'Sin resultado aun', 0, 1, 1, 1);
 COMMIT;
 
 

@@ -5,7 +5,8 @@ CREATE OR REPLACE PACKAGE pkg_autenticacion AS
     username         VARCHAR2(80),
     password         VARCHAR2(40),
     telefono         VARCHAR2(12),
-    correo           VARCHAR2(80));
+    correo           VARCHAR2(80),
+    id_rol           NUMBER(38));
 
   PROCEDURE pr_validar_usuario(p_username usuario.username%TYPE, p_password usuario.password%TYPE, p_usuario OUT tp_usuario);
 
@@ -16,8 +17,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_autenticacion AS
 
   PROCEDURE pr_validar_usuario (p_username usuario.username%TYPE, p_password usuario.password%TYPE, p_usuario OUT tp_usuario) AS
   BEGIN
-    SELECT id_usuario,username,password,telefono,correo
-    INTO p_usuario.id_usuario,p_usuario.username,p_usuario.password,p_usuario.telefono,p_usuario.correo
+    SELECT id_usuario,username,password,telefono,correo, id_rol
+    INTO p_usuario.id_usuario,p_usuario.username,p_usuario.password,p_usuario.telefono,p_usuario.correo, p_usuario.id_rol
     FROM usuario
     WHERE username LIKE p_username AND password = p_password;
   END;

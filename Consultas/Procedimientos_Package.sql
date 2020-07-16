@@ -1,9 +1,26 @@
 CREATE OR REPLACE PACKAGE pkg_autenticacion AS
 
+  TYPE tp_usuario IS RECORD (
+    id_usuario       NUMBER(38),
+    username         VARCHAR2(80),
+    password         VARCHAR2(40),
+    telefono         VARCHAR2(12),
+    correo           VARCHAR2(80));
+
+  PROCEDURE pr_validar_usuario(p_username usuario.username%TYPE, p_password usuario.password%TYPE, p_usuario OUT tp_usuario);
+
 END pkg_autenticacion;
 /
 
 CREATE OR REPLACE PACKAGE BODY pkg_autenticacion AS
+
+  PROCEDURE pr_validar_usuario (p_username usuario.username%TYPE, p_password usuario.password%TYPE, p_usuario OUT tp_usuario) AS
+  BEGIN
+    SELECT id_usuario,username,password,telefono,correo
+    INTO p_usuario.id_usuario,p_usuario.username,p_usuario.password,p_usuario.telefono,p_usuario.correo
+    FROM usuario
+    WHERE username LIKE p_username AND password = p_password;
+  END;
 
 END pkg_autenticacion;
 /
@@ -201,6 +218,7 @@ CREATE OR REPLACE PACKAGE pkg_cliente AS
   TYPE tb_cliente IS TABLE OF tp_cliente;
 
   PROCEDURE pr_obtener_cliente(p_id_usuario usuario.id_usuario%TYPE, p_cliente OUT tp_cliente);
+  PROCEDURE pr_obtener_cliente_profesional(p_id_profesional cliente.id_profesional%TYPE,p_cliente OUT tb_cliente);
   PROCEDURE pr_insertar_cliente(
     p_username in usuario.username%TYPE,
     p_password in usuario.password%TYPE,
@@ -235,6 +253,29 @@ CREATE OR REPLACE PACKAGE BODY pkg_cliente AS
     FROM cliente JOIN usuario USING(id_usuario)
     WHERE id_usuario = p_id_usuario;
 
+  END;
+
+  PROCEDURE pr_obtener_cliente_profesional(p_id_profesional cliente.id_profesional%TYPE,p_cliente OUT tb_cliente) AS
+  /**************************************************************************************************************
+     NAME:      pr_obtener_cliente_profesional
+     PURPOSE		Obtiene datos de cliente y usuario
+
+     REVISIONS:
+     Ver          Date           Author                               Description
+     ---------    ----------     -------------------                  ----------------------------------------------
+     1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+  ***************************************************************************************************************/
+  CURSOR cliente_cursor  IS
+  SELECT id_usuario,username,password,telefono,correo,id_cliente,nombre,direccion,rubro,id_profesional
+  FROM cliente JOIN usuario USING(id_usuario)
+  WHERE id_profesional = p_id_profesional;
+  BEGIN
+    OPEN cliente_cursor;
+      LOOP
+          FETCH cliente_cursor BULK COLLECT INTO p_cliente;
+          EXIT WHEN cliente_cursor%NOTFOUND;
+      END LOOP;
   END;
 
   PROCEDURE pr_insertar_cliente (
@@ -871,7 +912,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_contrato AS
     SELECT id_contrato,fecha_inicio,fecha_termino,fecha_facturacion,id_cliente,id_plan
     INTO p_contrato.id_contrato,p_contrato.fecha_inicio,p_contrato.fecha_termino,p_contrato.fecha_facturacion,p_contrato.id_cliente,p_contrato.id_plan
     FROM contrato
-    WHERE p_id_cliente = p_id_cliente;
+    WHERE id_cliente = p_id_cliente;
   END;
 
   PROCEDURE pr_insertar_contrato(

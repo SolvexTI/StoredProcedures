@@ -1212,6 +1212,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
     INSERT INTO incidente (id_incidente, fecha, descripcion)
     VALUES(id_incidente_seq.NEXTVAL, p_fecha, p_descripcion);
     INSERT INTO trabajador_incidente VALUES(p_id_trabajador, id_incidente_seq.CURRVAL);
+    pr_insertar_incidente(id_incidente_seq.CURRVAL, p_incidente);
   END;
   PROCEDURE pr_eliminar_incidente(p_id_incidente incidente.id_incidente%TYPE) AS
   /**************************************************************************************************************

@@ -556,7 +556,10 @@ CREATE OR REPLACE PACKAGE pkg_tipo_actividad AS
   );
 
   TYPE tb_tipo_actividad IS TABLE OF tp_tipo_actividad;
-  PROCEDURE pr_obtener_tipo_actividades(p_tipo_actividad OUT tb_tipo_actividad);
+  TYPE c_tipo_actividad IS REF CURSOR RETURN tipo_actividad%ROWTYPE;
+
+
+  PROCEDURE pr_obtener_tipo_actividades(p_cursor_tipo_actividad OUT c_tipo_actividad);
   PROCEDURE pr_obtener_tipo_actividad(p_id_tipo_actividad tipo_actividad.id_tipo_actividad%TYPE, p_tipo_actividad OUT tp_tipo_actividad);
 
 END pkg_tipo_actividad;
@@ -564,7 +567,7 @@ END pkg_tipo_actividad;
 
 CREATE OR REPLACE PACKAGE BODY pkg_tipo_actividad AS
 
-  PROCEDURE pr_obtener_tipo_actividades(p_tipo_actividad OUT tb_tipo_actividad) AS
+  PROCEDURE pr_obtener_tipo_actividades(p_cursor_tipo_actividad OUT c_tipo_actividad) AS
   /**************************************************************************************************************
      NAME:      pr_obtener_tipo_actividades
      PURPOSE		Obtiene todos los tipos de actividad en el sistema segun trabajador y devuelve tipo tabla tb_incidente
@@ -575,15 +578,10 @@ CREATE OR REPLACE PACKAGE BODY pkg_tipo_actividad AS
      1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
   ***************************************************************************************************************/
-    CURSOR tipo_actividad_cursor IS
+  BEGIN
+    OPEN p_cursor_tipo_actividad FOR
     SELECT id_tipo_actividad, nombre
     FROM tipo_actividad;
-  BEGIN
-    OPEN tipo_actividad_cursor;
-      LOOP
-          FETCH tipo_actividad_cursor BULK COLLECT INTO p_tipo_actividad;
-          EXIT WHEN tipo_actividad_cursor%NOTFOUND;
-      END LOOP;
   END;
 
   PROCEDURE pr_obtener_tipo_actividad(p_id_tipo_actividad tipo_actividad.id_tipo_actividad%TYPE, p_tipo_actividad OUT tp_tipo_actividad) AS

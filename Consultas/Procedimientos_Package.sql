@@ -44,9 +44,10 @@ CREATE OR REPLACE PACKAGE pkg_profesional AS
   );
 
   TYPE tb_profesional IS TABLE OF tp_profesional;
+  TYPE c_profesional IS REF CURSOR RETURN tp_profesional;
 
   PROCEDURE pr_obtener_profesional(p_id_usuario IN profesional.id_usuario%TYPE,p_profesional OUT tp_profesional);
-  PROCEDURE pr_obtener_profesionales(p_profesional OUT tb_profesional);
+  PROCEDURE pr_obtener_profesionales(p_cursor_profesional OUT c_profesional);
   PROCEDURE pr_insertar_profesional(
       p_username IN usuario.username%TYPE,
       p_password IN usuario.password%TYPE,
@@ -106,16 +107,12 @@ CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
     CURSOR profesional_cursor  IS
     SELECT id_usuario,username,password,telefono,correo,id_profesional,nombre,apellido_paterno,apellido_materno,rut,dv
     FROM usuario u JOIN profesional p USING(id_usuario);
-    v_error_code NUMBER(10);
+
   BEGIN
-    OPEN profesional_cursor;
-      LOOP
-          FETCH profesional_cursor BULK COLLECT INTO p_profesional;
-          EXIT WHEN profesional_cursor%NOTFOUND;
-      END LOOP;
-    EXCEPTION
-      WHEN NO_DATA_FOUND THEN
-          NULL;
+
+    OPEN p_cursor_profesional FOR
+    SELECT id_usuario,username,password,telefono,correo,id_profesional,nombre,apellido_paterno,apellido_materno,rut,dv
+    FROM usuario u JOIN profesional p USING(id_usuario);
 
   END;
 
@@ -217,9 +214,10 @@ CREATE OR REPLACE PACKAGE pkg_cliente AS
   );
 
   TYPE tb_cliente IS TABLE OF tp_cliente;
+  TYPE c_cliente IS REF CURSOR RETURN tp_cliente;
 
   PROCEDURE pr_obtener_cliente(p_id_usuario usuario.id_usuario%TYPE, p_cliente OUT tp_cliente);
-  PROCEDURE pr_obtener_cliente_profesional(p_id_profesional cliente.id_profesional%TYPE,p_cliente OUT tb_cliente);
+  PROCEDURE pr_obtener_cliente_profesional(p_id_profesional cliente.id_profesional%TYPE,p_cursor_cliente OUT c_cliente);
   PROCEDURE pr_insertar_cliente(
     p_username in usuario.username%TYPE,
     p_password in usuario.password%TYPE,
@@ -256,7 +254,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_cliente AS
 
   END;
 
-  PROCEDURE pr_obtener_cliente_profesional(p_id_profesional cliente.id_profesional%TYPE,p_cliente OUT tb_cliente) AS
+  PROCEDURE pr_obtener_cliente_profesional(p_id_profesional cliente.id_profesional%TYPE,p_cursor_cliente OUT c_cliente) AS
   /**************************************************************************************************************
      NAME:      pr_obtener_cliente_profesional
      PURPOSE		Obtiene datos de cliente y usuario
@@ -267,16 +265,11 @@ CREATE OR REPLACE PACKAGE BODY pkg_cliente AS
      1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
   ***************************************************************************************************************/
-  CURSOR cliente_cursor  IS
-  SELECT id_usuario,username,password,telefono,correo,id_cliente,nombre,direccion,rubro,id_profesional
-  FROM cliente JOIN usuario USING(id_usuario)
-  WHERE id_profesional = p_id_profesional;
   BEGIN
-    OPEN cliente_cursor;
-      LOOP
-          FETCH cliente_cursor BULK COLLECT INTO p_cliente;
-          EXIT WHEN cliente_cursor%NOTFOUND;
-      END LOOP;
+    OPEN p_cursor_cliente FOR
+    SELECT id_usuario,username,password,telefono,correo,id_cliente,nombre,direccion,rubro,id_profesional
+    FROM cliente JOIN usuario USING(id_usuario)
+    WHERE id_profesional = p_id_profesional;
   END;
 
   PROCEDURE pr_insertar_cliente (
@@ -348,10 +341,10 @@ CREATE  OR REPLACE PACKAGE pkg_actividad AS
   );
 
   TYPE tb_actividad IS TABLE OF tp_actividad;
-
+  TYPE c_actividad IS REF CURSOR RETURN actividad%ROWTYPE;
   PROCEDURE pr_obtener_actividad(p_id_actividad actividad.id_actividad%TYPE, p_actividad OUT tp_actividad);
-  PROCEDURE pr_obtener_actividad_profesional(p_id_profesional profesional.id_profesional%TYPE, p_actividad OUT tb_actividad);
-  PROCEDURE pr_obtener_actividad_cliente(p_id_cliente cliente.id_cliente%TYPE, p_actividad OUT tb_actividad);
+  PROCEDURE pr_obtener_actividad_profesional(p_id_profesional profesional.id_profesional%TYPE, p_cursor_actividad OUT c_actividad);
+  PROCEDURE pr_obtener_actividad_cliente(p_id_cliente cliente.id_cliente%TYPE, p_cursor_actividad OUT c_actividad);
   PROCEDURE pr_insertar_actividad (
     p_nombre in actividad.nombre%type,
     p_descripcion in actividad.descripcion%type,
@@ -401,7 +394,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
     WHERE id_actividad = p_id_actividad;
   END;
 
-  PROCEDURE pr_obtener_actividad_profesional(p_id_profesional profesional.id_profesional%TYPE,p_actividad OUT tb_actividad) AS
+  PROCEDURE pr_obtener_actividad_profesional(p_id_profesional profesional.id_profesional%TYPE,p_cursor_actividad OUT c_actividad) AS
   /**************************************************************************************************************
      NAME:      pr_obtener_actividad_profesional
      PURPOSE		Obtiene datos de actividades de un profesional
@@ -412,21 +405,14 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
      1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
   ***************************************************************************************************************/
-    CURSOR act_cursor  IS
+  BEGIN
+    OPEN p_cursor_actividad FOR
     SELECT id_actividad,a.nombre,descripcion,estado,fecha_inicio,resultado,cantidad_modificaciones,id_profesional,id_cliente,ta.nombre
     FROM actividad a join tipo_actividad ta USING(id_tipo_actividad)
     WHERE id_profesional = p_id_profesional;
-
-  BEGIN
-    OPEN act_cursor;
-      LOOP
-          FETCH act_cursor BULK COLLECT INTO p_actividad;
-          EXIT WHEN act_cursor%NOTFOUND;
-      END LOOP;
-
   END;
 
-  PROCEDURE pr_obtener_actividad_cliente(p_id_cliente cliente.id_cliente%TYPE, p_actividad OUT tb_actividad) AS
+  PROCEDURE pr_obtener_actividad_cliente(p_id_cliente cliente.id_cliente%TYPE, p_cursor_actividad OUT c_actividad) AS
   /**************************************************************************************************************
      NAME:      pr_obtener_actividad_cliente
      PURPOSE		Obtiene actividades de un cliente
@@ -437,17 +423,11 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
      1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
   ***************************************************************************************************************/
-    CURSOR act_cursor  IS
+  BEGIN
+    OPEN p_cursor_actividad FOR
     SELECT id_actividad,a.nombre,descripcion,estado,fecha_inicio,resultado,cantidad_modificaciones,id_profesional,id_cliente,ta.nombre
     FROM actividad a join tipo_actividad ta USING(id_tipo_actividad)
     WHERE id_cliente = p_id_cliente;
-  BEGIN
-    OPEN act_cursor;
-      LOOP
-          FETCH act_cursor BULK COLLECT INTO p_actividad;
-          EXIT WHEN act_cursor%NOTFOUND;
-      END LOOP;
-
   END;
 
   PROCEDURE pr_insertar_actividad (
@@ -616,9 +596,10 @@ CREATE OR REPLACE PACKAGE pkg_punto_mejorable AS
   );
 
   TYPE tb_punto_mejorable IS TABLE OF tp_punto_mejorable;
+  TYPE c_punto_mejorable IS REF CURSOR RETURN punto_mejorable%ROWTYPE;
 
   PROCEDURE pr_obtener_punto_mejorable(p_id_punto_mejorable punto_mejorable.id_punto_mejorable%TYPE, p_punto_mejorable OUT tp_punto_mejorable);
-  PROCEDURE pr_obtener_punto_mejorable_activadad(p_id_actividad actividad.id_actividad%TYPE, p_punto_mejorable OUT tb_punto_mejorable);
+  PROCEDURE pr_obtener_punto_mejorable_activadad(p_id_actividad actividad.id_actividad%TYPE, p_cursor_punto_mejorable OUT c_punto_mejorable);
   PROCEDURE pr_insertar_punto_mejorable (
     p_titulo IN punto_mejorable.titulo%TYPE,
     p_descripcion IN punto_mejorable.descripcion%TYPE,
@@ -654,7 +635,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_punto_mejorable AS
     WHERE id_punto_mejorable = p_id_punto_mejorable;
   END;
 
-  PROCEDURE pr_obtener_punto_mejorable_activadad(p_id_actividad actividad.id_actividad%TYPE, p_punto_mejorable OUT tb_punto_mejorable) AS
+  PROCEDURE pr_obtener_punto_mejorable_activadad(p_id_actividad actividad.id_actividad%TYPE, p_cursor_punto_mejorable OUT c_punto_mejorable) AS
   /**************************************************************************************************************
      NAME:      pr_obtener_punto_mejorable_activadad
      PURPOSE	 Obtiene datos de punto mejorable por actividad
@@ -665,16 +646,11 @@ CREATE OR REPLACE PACKAGE BODY pkg_punto_mejorable AS
      1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
   ***************************************************************************************************************/
-    CURSOR act_cursor  IS
+  BEGIN
+    OPEN p_cursor_punto_mejorable FOR
     SELECT id_punto_mejorable,titulo,descripcion,cumplido,resultado,id_actividad
     FROM punto_mejorable
     WHERE id_actividad = p_id_actividad;
-  BEGIN
-    OPEN act_cursor;
-      LOOP
-          FETCH act_cursor BULK COLLECT INTO p_punto_mejorable;
-          EXIT WHEN act_cursor%NOTFOUND;
-      END LOOP;
 
   END;
 
@@ -755,9 +731,10 @@ CREATE OR REPLACE PACKAGE pkg_plan AS
   );
 
   TYPE tb_plan IS TABLE OF tp_plan;
+  TYPE c_plan IS REF CURSOR RETURN plan%ROWTYPE;
 
   PROCEDURE pr_obtener_plan(p_id_plan plan.id_plan%TYPE, p_plan OUT tp_plan);
-  PROCEDURE pr_obtener_planes ( p_plan OUT tb_plan);
+  PROCEDURE pr_obtener_planes ( p_cursor_plan OUT c_plan);
   PROCEDURE pr_insertar_plan (
             p_valor plan.valor%type,
             p_descripcion plan.descripcion%type,
@@ -791,7 +768,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_plan AS
     WHERE id_plan = p_id_plan;
   END;
 
-  PROCEDURE pr_obtener_planes ( p_plan OUT tb_plan) AS
+  PROCEDURE pr_obtener_planes ( p_cursor_plan OUT c_plan) AS
   /**************************************************************************************************************
      NAME:      pr_obtener_planes
      PURPOSE		Obtiene datos de todos los olanas y devuelve una lista del tipo tp_plan
@@ -802,15 +779,10 @@ CREATE OR REPLACE PACKAGE BODY pkg_plan AS
      1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
   ***************************************************************************************************************/
-    CURSOR plan_cursor  IS
+  BEGIN
+    OPEN p_cursor_plan FOR
     SELECT id_plan,valor,descripcion
     FROM plan;
-  BEGIN
-    OPEN plan_cursor;
-      LOOP
-          FETCH plan_cursor BULK COLLECT INTO p_plan;
-          EXIT WHEN plan_cursor%NOTFOUND;
-      END LOOP;
   END;
 
 
@@ -983,10 +955,10 @@ CREATE OR REPLACE PACKAGE pkg_trabajador AS
   );
 
   TYPE tb_trabajador IS TABLE OF tp_trabajador;
-
+  TYPE c_trabajador IS REF CURSOR RETURN trabajador%ROWTYPE;
   PROCEDURE pr_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p_trabajador OUT tp_trabajador) ;
-  PROCEDURE pr_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE, p_trabajador OUT tb_trabajador);
-  PROCEDURE pr_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE, p_trabajador OUT tb_trabajador);
+  PROCEDURE pr_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE, p_cursor_trabajador OUT c_trabajador);
+  PROCEDURE pr_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE, p_cursor_trabajador OUT c_trabajador);
   PROCEDURE pr_insertar_trabajador(
             p_rut trabajador.rut%TYPE,
             p_dv trabajador.dv%TYPE,
@@ -1028,7 +1000,7 @@ PROCEDURE pr_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p
     WHERE id_trabajador = p_id_trabajador;
   END;
 
-  PROCEDURE pr_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE, p_trabajador OUT tb_trabajador)  AS
+  PROCEDURE pr_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE, p_cursor_trabajador OUT c_trabajador)  AS
   /**************************************************************************************************************
      NAME:      pr_obtener_trabajadores_actividad
      PURPOSE		Obtiene datos de trabajadores que asisten a una actividad, devuelve tipo tabla tb_trabajador
@@ -1039,19 +1011,14 @@ PROCEDURE pr_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p
      1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
   ***************************************************************************************************************/
-    CURSOR trabajador_cursor  IS
+  BEGIN
+    OPEN p_cursor_trabajador FOR
     SELECT id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente
     FROM trabajador join actividad_trabajador USING(id_trabajador)
     WHERE id_actividad = p_id_actividad;
-  BEGIN
-    OPEN trabajador_cursor;
-      LOOP
-          FETCH trabajador_cursor BULK COLLECT INTO p_trabajador;
-          EXIT WHEN trabajador_cursor%NOTFOUND;
-      END LOOP;
   END;
 
-  PROCEDURE pr_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE, p_trabajador OUT tb_trabajador)  AS
+  PROCEDURE pr_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE, p_cursor_trabajador OUT c_trabajador)  AS
   /**************************************************************************************************************
      NAME:      pr_obtener_trabajador_cliente
      PURPOSE		Obtiene datos de trabajadorres aosciados a un cliente, devuelve tipo tabla tb_trabajador
@@ -1062,16 +1029,11 @@ PROCEDURE pr_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p
      1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
   ***************************************************************************************************************/
-    CURSOR trabajador_cursor  IS
+  BEGIN
+    OPEN p_cursor_trabajador FOR
     SELECT id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente
     FROM trabajador
     WHERE id_cliente = p_id_cliente;
-  BEGIN
-    OPEN trabajador_cursor;
-      LOOP
-          FETCH trabajador_cursor BULK COLLECT INTO p_trabajador;
-          EXIT WHEN trabajador_cursor%NOTFOUND;
-      END LOOP;
   END;
 
   PROCEDURE pr_insertar_trabajador(
@@ -1157,10 +1119,11 @@ CREATE OR REPLACE PACKAGE pkg_incidente AS
   );
 
   TYPE tb_incidente IS TABLE OF tp_incidente;
+  TYPE c_incidente IS REF CURSOR RETURN incidente%ROWTYPE;
 
   PROCEDURE pr_obtener_incidente(p_id_incidente incidente.id_incidente%TYPE, p_incidente OUT tp_incidente);
-  PROCEDURE pr_obtener_incidente_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p_incidente OUT tb_incidente);
-  PROCEDURE pr_obtener_incidente_cliente(p_id_cliente cliente.id_cliente%TYPE, p_incidente OUT tb_incidente);
+  PROCEDURE pr_obtener_incidente_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p_cursor_incidente OUT c_incidente);
+  PROCEDURE pr_obtener_incidente_cliente(p_id_cliente cliente.id_cliente%TYPE, p_cursor_incidente OUT c_incidente);
   PROCEDURE pr_insertar_incidente(
             p_fecha incidente.fecha%TYPE,
             p_descripcion incidente.descripcion%TYPE,
@@ -1195,7 +1158,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
     FROM incidente
     WHERE id_incidente = p_id_incidente;
   END;
-  PROCEDURE pr_obtener_incidente_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p_incidente OUT tb_incidente) AS
+  PROCEDURE pr_obtener_incidente_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p_cursor_incidente OUT c_incidente) AS
   /**************************************************************************************************************
      NAME:      pr_obtener_incidente_trabajador
      PURPOSE		Obtiene todos los incidentes segun trabajador y devuelve tipo tabla tb_incidente
@@ -1206,18 +1169,14 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
      1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
   ***************************************************************************************************************/
-    CURSOR incidente_cursor IS
+
+  BEGIN
+    OPEN p_cursor_incidente FOR
     SELECT id_incidente, fecha, descripcion
     FROM incidente JOIN trabajador_incidente USING(id_incidente)
     WHERE id_trabajador = p_id_trabajador;
-  BEGIN
-    OPEN incidente_cursor;
-      LOOP
-          FETCH incidente_cursor BULK COLLECT INTO p_incidente;
-          EXIT WHEN incidente_cursor%NOTFOUND;
-      END LOOP;
   END;
-  PROCEDURE pr_obtener_incidente_cliente(p_id_cliente cliente.id_cliente%TYPE, p_incidente OUT tb_incidente) AS
+  PROCEDURE pr_obtener_incidente_cliente(p_id_cliente cliente.id_cliente%TYPE, p_cursor_incidente OUT c_incidente) AS
   /**************************************************************************************************************
      NAME:      pr_obtener_incidente_cliente
      PURPOSE		Obtiene todos los incidentes segun cliente y devuelve tipo tabla tb_incidente
@@ -1228,16 +1187,11 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
      1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
   ***************************************************************************************************************/
-    CURSOR incidente_cursor IS
+  BEGIN
+    OPEN p_cursor_incidente FOR
     SELECT id_incidente, fecha, descripcion
     FROM incidente JOIN trabajador_incidente USING(id_incidente) JOIN trabajador USING(id_trabajador)
     WHERE id_cliente = p_id_cliente;
-  BEGIN
-    OPEN incidente_cursor;
-      LOOP
-          FETCH incidente_cursor BULK COLLECT INTO p_incidente;
-          EXIT WHEN incidente_cursor%NOTFOUND;
-      END LOOP;
   END;
   PROCEDURE pr_insertar_incidente(
             p_fecha incidente.fecha%TYPE,
@@ -1307,16 +1261,16 @@ CREATE OR REPLACE PACKAGE pkg_notificacion AS
   );
 
   TYPE tb_notificacion IS TABLE OF tp_notificacion;
+  TYPE c_notificacion IS REF CURSOR RETURN notificacion%ROWTYPE;
 
   PROCEDURE pr_obtener_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE, p_notificacion OUT tp_notificacion);
-  PROCEDURE pr_obtener_notificacion_usuario(p_id_usuario notificacion.id_usuario%TYPE,  p_notificacion OUT tb_notificacion) ;
+  PROCEDURE pr_obtener_notificacion_usuario(p_id_usuario notificacion.id_usuario%TYPE,  p_cursor_notificacion OUT c_notificacion) ;
   PROCEDURE pr_insertar_notificacion(
             p_mensaje notificacion.mensaje%TYPE,
             p_hora notificacion.hora%TYPE,
             p_id_usuario notificacion.id_usuario%TYPE,
             p_notificacion OUT tp_notificacion);
   PROCEDURE pr_eliminar_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE);
-
 END;
 /
 
@@ -1340,7 +1294,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_notificacion AS
     WHERE id_notificacion = p_id_notificacion;
   END;
 
-  PROCEDURE pr_obtener_notificacion_usuario(p_id_usuario notificacion.id_usuario%TYPE,  p_notificacion OUT tb_notificacion) AS
+  PROCEDURE pr_obtener_notificacion_usuario(p_id_usuario notificacion.id_usuario%TYPE,  p_cursor_notificacion OUT c_notificacion) AS
   /**************************************************************************************************************
      NAME:      pr_obtener_notificacion_usuario
      PURPOSE		Obtiene datos de notificacion segun su ID de usuario
@@ -1351,16 +1305,11 @@ CREATE OR REPLACE PACKAGE BODY pkg_notificacion AS
      1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
   ***************************************************************************************************************/
-    CURSOR notificacion_cursor IS
+  BEGIN
+    OPEN p_cursor_notificacion FOR
     SELECT id_notificacion,mensaje,hora,id_usuario
     FROM notificacion
     WHERE id_usuario = p_id_usuario;
-  BEGIN
-    OPEN notificacion_cursor;
-      LOOP
-          FETCH notificacion_cursor BULK COLLECT INTO p_notificacion;
-          EXIT WHEN notificacion_cursor%NOTFOUND;
-      END LOOP;
   END;
 
   PROCEDURE pr_insertar_notificacion(

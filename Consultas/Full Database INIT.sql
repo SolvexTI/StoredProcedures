@@ -13,11 +13,6 @@ CREATE TABLE actividad (
                            id_tipo_actividad         INTEGER NOT NULL
 );
 
-CREATE UNIQUE INDEX actividad__idx ON
-    actividad (
-               id_tipo_actividad
-               ASC );
-
 ALTER TABLE actividad ADD CONSTRAINT actividad_pk PRIMARY KEY ( id_actividad );
 
 CREATE TABLE actividad_trabajador (

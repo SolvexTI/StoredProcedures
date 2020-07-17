@@ -336,7 +336,7 @@ CREATE  OR REPLACE PACKAGE pkg_actividad AS
     cantidad_modificaciones NUMBER(38),
     id_profesional          NUMBER(38),
     id_cliente              NUMBER(38),
-    id_tipo_actividad       NUMBER(38)
+    id_tipo_actividad        NUMBER(38)
 
   );
 

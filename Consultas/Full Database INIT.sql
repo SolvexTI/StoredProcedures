@@ -291,17 +291,6 @@ ALTER TABLE notificacion MODIFY hora NUMBER;
 
 commit;
 
-/**************************************************************************************************************
-   NAME:        Secuencias
-   PURPOSE		Gestiona secuencias de la base de datos Solvexti
-
-   REVISIONS:
-   Ver          Date           Author                               Description
-   ---------    ----------     -------------------                  ----------------------------------------------
-   1.1.1-1.1    02/06/2020     Alejandro Del Pino       			1. Creacion de Secuencias
-
-***************************************************************************************************************/
-
 CREATE SEQUENCE ID_ACTIVIDAD_SEQ START WITH 1;
 CREATE SEQUENCE ID_BOLETA_SEQ START WITH 1;
 CREATE SEQUENCE ID_CLIENTE_SEQ START WITH 1;
@@ -316,7 +305,6 @@ CREATE SEQUENCE ID_USUARIO_SEQ START WITH 1;
 CREATE SEQUENCE ID_NOTIFICACION_SEQ START WITH 1;
 CREATE SEQUENCE ID_PLAN_SEQ START WITH 1;
 CREATE SEQUENCE ID_PROFESIONAL_SEQ START WITH 1;
-
 
 COMMIT;
 
@@ -1449,8 +1437,8 @@ CREATE OR REPLACE PACKAGE pkg_incidente AS
     PROCEDURE pr_insertar_incidente(
         p_fecha incidente.fecha%TYPE,
         p_descripcion incidente.descripcion%TYPE,
-        p_incidente OUT tp_incidente,
-        p_id_trabajador trabajador.id_trabajador%TYPE);
+        p_id_trabajador trabajador.id_trabajador%TYPE,
+        p_incidente OUT tp_incidente);
     PROCEDURE pr_eliminar_incidente(p_id_incidente incidente.id_incidente%TYPE);
     PROCEDURE pr_modificar_incidente(
         p_id_incidente incidente.id_incidente%TYPE,
@@ -1518,8 +1506,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
     PROCEDURE pr_insertar_incidente(
         p_fecha incidente.fecha%TYPE,
         p_descripcion incidente.descripcion%TYPE,
-        p_incidente OUT tp_incidente,
-        p_id_trabajador trabajador.id_trabajador%TYPE) AS
+        p_id_trabajador trabajador.id_trabajador%TYPE,
+        p_incidente OUT tp_incidente) AS
         /**************************************************************************************************************
            NAME:      pr_insertar_incidente
            PURPOSE	  Inserta datos de incidente y devuelve tipo tp_incidente
@@ -1534,6 +1522,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
         INSERT INTO incidente (id_incidente, fecha, descripcion)
         VALUES(id_incidente_seq.NEXTVAL, p_fecha, p_descripcion);
         INSERT INTO trabajador_incidente VALUES(p_id_trabajador, id_incidente_seq.CURRVAL);
+        pr_insertar_incidente(id_incidente_seq.CURRVAL, p_incidente);
     END;
     PROCEDURE pr_eliminar_incidente(p_id_incidente incidente.id_incidente%TYPE) AS
         /**************************************************************************************************************
@@ -1672,7 +1661,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_notificacion AS
 END;
 /
 
-commit;
+COMMIT;
 
 /**************************************************************************************************************
    NAME:        DUMP_DATA
@@ -1725,10 +1714,10 @@ INSERT INTO TRABAJADOR VALUES(ID_TRABAJADOR_SEQ.NEXTVAL,19307652,'1','Alejandro'
 INSERT INTO TIPO_ACTIVIDAD VALUES(ID_TIPO_ACTIVIDAD_SEQ.NEXTVAL, 'Asesoria general');
 INSERT INTO TIPO_ACTIVIDAD VALUES(ID_TIPO_ACTIVIDAD_SEQ.NEXTVAL, 'Asesoria por accidente');
 INSERT INTO TIPO_ACTIVIDAD VALUES(ID_TIPO_ACTIVIDAD_SEQ.NEXTVAL, 'Asesoria por multa');
+INSERT INTO TIPO_ACTIVIDAD VALUES(ID_TIPO_ACTIVIDAD_SEQ.NEXTVAL, 'Asesoria especial');
 INSERT INTO TIPO_ACTIVIDAD VALUES(ID_TIPO_ACTIVIDAD_SEQ.NEXTVAL, 'Capacitacion');
 INSERT INTO TIPO_ACTIVIDAD VALUES(ID_TIPO_ACTIVIDAD_SEQ.NEXTVAL, 'Revision Documentacion');
 INSERT INTO TIPO_ACTIVIDAD VALUES(ID_TIPO_ACTIVIDAD_SEQ.NEXTVAL, 'Llamada telefonica');
-INSERT INTO TIPO_ACTIVIDAD VALUES(ID_TIPO_ACTIVIDAD_SEQ.NEXTVAL, 'Llamada especial');
 COMMIT;
 
 

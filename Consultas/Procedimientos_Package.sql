@@ -336,7 +336,7 @@ CREATE  OR REPLACE PACKAGE pkg_actividad AS
     cantidad_modificaciones NUMBER(38),
     id_profesional          NUMBER(38),
     id_cliente              NUMBER(38),
-    id_tipo_actividad        NUMBER(38)
+    id_tipo_actividad       NUMBER(38)
 
   );
 
@@ -1127,8 +1127,8 @@ CREATE OR REPLACE PACKAGE pkg_incidente AS
   PROCEDURE pr_insertar_incidente(
             p_fecha incidente.fecha%TYPE,
             p_descripcion incidente.descripcion%TYPE,
-            p_incidente OUT tp_incidente,
-            p_id_trabajador trabajador.id_trabajador%TYPE);
+            p_id_trabajador trabajador.id_trabajador%TYPE,
+            p_incidente OUT tp_incidente);
   PROCEDURE pr_eliminar_incidente(p_id_incidente incidente.id_incidente%TYPE);
   PROCEDURE pr_modificar_incidente(
             p_id_incidente incidente.id_incidente%TYPE,
@@ -1196,8 +1196,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
   PROCEDURE pr_insertar_incidente(
             p_fecha incidente.fecha%TYPE,
             p_descripcion incidente.descripcion%TYPE,
-            p_incidente OUT tp_incidente,
-            p_id_trabajador trabajador.id_trabajador%TYPE) AS
+            p_id_trabajador trabajador.id_trabajador%TYPE,
+            p_incidente OUT tp_incidente) AS
   /**************************************************************************************************************
      NAME:      pr_insertar_incidente
      PURPOSE	  Inserta datos de incidente y devuelve tipo tp_incidente

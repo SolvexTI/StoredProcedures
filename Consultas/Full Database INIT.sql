@@ -270,6 +270,32 @@ ALTER TABLE usuario
     ADD CONSTRAINT usuario_rol_fk FOREIGN KEY ( id_rol )
         REFERENCES rol ( id_rol );
 
+commit;
+
+-- Correccion tipo de datos tablas de Date a NUMBER
+
+-- Zona borrado de datos
+
+DELETE FROM actividad WHERE 1 = 1;
+DELETE FROM boleta WHERE 1 = 1;
+DELETE FROM cargo_extra WHERE 1 = 1;
+DELETE FROM contrato WHERE 1 = 1;
+DELETE FROM incidente WHERE 1 = 1;
+DELETE FROM notificacion WHERE 1 = 1;
+
+-- Zona modificacion de columnas
+
+ALTER TABLE actividad MODIFY fecha_inicio NUMBER;
+ALTER TABLE boleta MODIFY fecha_pago NUMBER;
+ALTER TABLE cargo_extra MODIFY fecha NUMBER;
+ALTER TABLE contrato MODIFY fecha_inicio NUMBER;
+ALTER TABLE contrato MODIFY fecha_termino NUMBER;
+ALTER TABLE contrato MODIFY fecha_facturacion NUMBER;
+ALTER TABLE incidente MODIFY fecha NUMBER;
+ALTER TABLE notificacion MODIFY hora NUMBER;
+
+commit;
+
 /**************************************************************************************************************
    NAME:        Secuencias
    PURPOSE		Gestiona secuencias de la base de datos Solvexti
@@ -299,13 +325,30 @@ CREATE SEQUENCE ID_PROFESIONAL_SEQ START WITH 1;
 
 COMMIT;
 
-
 CREATE OR REPLACE PACKAGE pkg_autenticacion AS
+
+    TYPE tp_usuario IS RECORD (
+        id_usuario       NUMBER(38),
+        username         VARCHAR2(80),
+        password         VARCHAR2(40),
+        telefono         VARCHAR2(12),
+        correo           VARCHAR2(80),
+        id_rol           NUMBER(38));
+
+    PROCEDURE pr_validar_usuario(p_username usuario.username%TYPE, p_password usuario.password%TYPE, p_usuario OUT tp_usuario);
 
 END pkg_autenticacion;
 /
 
 CREATE OR REPLACE PACKAGE BODY pkg_autenticacion AS
+
+    PROCEDURE pr_validar_usuario (p_username usuario.username%TYPE, p_password usuario.password%TYPE, p_usuario OUT tp_usuario) AS
+    BEGIN
+        SELECT id_usuario,username,password,telefono,correo, id_rol
+        INTO p_usuario.id_usuario,p_usuario.username,p_usuario.password,p_usuario.telefono,p_usuario.correo, p_usuario.id_rol
+        FROM usuario
+        WHERE username LIKE p_username AND password = p_password;
+    END;
 
 END pkg_autenticacion;
 /
@@ -328,9 +371,10 @@ CREATE OR REPLACE PACKAGE pkg_profesional AS
         );
 
     TYPE tb_profesional IS TABLE OF tp_profesional;
+    TYPE c_profesional IS REF CURSOR RETURN tp_profesional;
 
     PROCEDURE pr_obtener_profesional(p_id_usuario IN profesional.id_usuario%TYPE,p_profesional OUT tp_profesional);
-    PROCEDURE pr_obtener_profesionales(p_profesional OUT tb_profesional);
+    PROCEDURE pr_obtener_profesionales(p_cursor_profesional OUT c_profesional);
     PROCEDURE pr_insertar_profesional(
         p_username IN usuario.username%TYPE,
         p_password IN usuario.password%TYPE,
@@ -343,7 +387,7 @@ CREATE OR REPLACE PACKAGE pkg_profesional AS
         p_dv IN profesional.dv%TYPE,
         p_profesional OUT tp_profesional);
     PROCEDURE pr_modificar_profesional(p_profesional OUT tp_profesional);
-    PROCEDURE pr_eliminar_profesional(p_profesional IN OUT tp_profesional);
+    PROCEDURE pr_eliminar_profesional(p_profesional IN tp_profesional);
 
 END pkg_profesional;
 /
@@ -390,16 +434,12 @@ CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
         CURSOR profesional_cursor  IS
             SELECT id_usuario,username,password,telefono,correo,id_profesional,nombre,apellido_paterno,apellido_materno,rut,dv
             FROM usuario u JOIN profesional p USING(id_usuario);
-        v_error_code NUMBER(10);
+
     BEGIN
-        OPEN profesional_cursor;
-        LOOP
-            FETCH profesional_cursor BULK COLLECT INTO p_profesional;
-            EXIT WHEN profesional_cursor%NOTFOUND;
-        END LOOP;
-    EXCEPTION
-        WHEN NO_DATA_FOUND THEN
-            NULL;
+
+        OPEN p_cursor_profesional FOR
+            SELECT id_usuario,username,password,telefono,correo,id_profesional,nombre,apellido_paterno,apellido_materno,rut,dv
+            FROM usuario u JOIN profesional p USING(id_usuario);
 
     END;
 
@@ -466,7 +506,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
         WHERE id_profesional = p_profesional.id_profesional;
     END;
 
-    PROCEDURE pr_eliminar_profesional(p_profesional IN OUT tp_profesional) AS
+    PROCEDURE pr_eliminar_profesional(p_profesional IN tp_profesional) AS
         /**************************************************************************************************************
            NAME:       	pr_eliminar_profesional
              PURPOSE		Elimina datos de profesional y usuario
@@ -501,8 +541,10 @@ CREATE OR REPLACE PACKAGE pkg_cliente AS
         );
 
     TYPE tb_cliente IS TABLE OF tp_cliente;
+    TYPE c_cliente IS REF CURSOR RETURN tp_cliente;
 
     PROCEDURE pr_obtener_cliente(p_id_usuario usuario.id_usuario%TYPE, p_cliente OUT tp_cliente);
+    PROCEDURE pr_obtener_cliente_profesional(p_id_profesional cliente.id_profesional%TYPE,p_cursor_cliente OUT c_cliente);
     PROCEDURE pr_insertar_cliente(
         p_username in usuario.username%TYPE,
         p_password in usuario.password%TYPE,
@@ -537,6 +579,24 @@ CREATE OR REPLACE PACKAGE BODY pkg_cliente AS
         FROM cliente JOIN usuario USING(id_usuario)
         WHERE id_usuario = p_id_usuario;
 
+    END;
+
+    PROCEDURE pr_obtener_cliente_profesional(p_id_profesional cliente.id_profesional%TYPE,p_cursor_cliente OUT c_cliente) AS
+        /**************************************************************************************************************
+           NAME:      pr_obtener_cliente_profesional
+           PURPOSE		Obtiene datos de cliente y usuario
+
+           REVISIONS:
+           Ver          Date           Author                               Description
+           ---------    ----------     -------------------                  ----------------------------------------------
+           1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+        ***************************************************************************************************************/
+    BEGIN
+        OPEN p_cursor_cliente FOR
+            SELECT id_usuario,username,password,telefono,correo,id_cliente,nombre,direccion,rubro,id_profesional
+            FROM cliente JOIN usuario USING(id_usuario)
+            WHERE id_profesional = p_id_profesional;
     END;
 
     PROCEDURE pr_insertar_cliente (
@@ -598,20 +658,20 @@ CREATE  OR REPLACE PACKAGE pkg_actividad AS
         nombre                  VARCHAR2(100),
         descripcion             VARCHAR2(600),
         estado                  CHAR(1),
-        fecha_inicio            DATE,
+        fecha_inicio            NUMBER(38),
         resultado               VARCHAR2(600),
         cantidad_modificaciones NUMBER(38),
         id_profesional          NUMBER(38),
         id_cliente              NUMBER(38),
-        tipo_actividad          VARCHAR2(80)
+        id_tipo_actividad       NUMBER(38)
 
         );
 
     TYPE tb_actividad IS TABLE OF tp_actividad;
-
+    TYPE c_actividad IS REF CURSOR RETURN actividad%ROWTYPE;
     PROCEDURE pr_obtener_actividad(p_id_actividad actividad.id_actividad%TYPE, p_actividad OUT tp_actividad);
-    PROCEDURE pr_obtener_actividad_profesional(p_id_profesional profesional.id_profesional%TYPE, p_actividad OUT tb_actividad);
-    PROCEDURE pr_obtener_actividad_cliente(p_id_cliente cliente.id_cliente%TYPE, p_actividad OUT tb_actividad);
+    PROCEDURE pr_obtener_actividad_profesional(p_id_profesional profesional.id_profesional%TYPE, p_cursor_actividad OUT c_actividad);
+    PROCEDURE pr_obtener_actividad_cliente(p_id_cliente cliente.id_cliente%TYPE, p_cursor_actividad OUT c_actividad);
     PROCEDURE pr_insertar_actividad (
         p_nombre in actividad.nombre%type,
         p_descripcion in actividad.descripcion%type,
@@ -621,13 +681,13 @@ CREATE  OR REPLACE PACKAGE pkg_actividad AS
         p_cantidad_modificaciones in actividad.cantidad_modificaciones%type,
         p_id_profesional in actividad.id_profesional%type,
         p_id_cliente in actividad.id_cliente%type,
-        p_tipo_actividad in tipo_actividad.nombre%type,
+        p_id_tipo_actividad in actividad.id_tipo_actividad%type,
         p_actividad out tp_actividad
     );
     PROCEDURE pr_eliminar_actividad(p_id_actividad actividad.id_actividad%TYPE);
     PROCEDURE pr_modificar_actividad(
-        p_id_actividad in actividad.id_actividad%TYPE
-            p_nombre in actividad.nombre%type,
+        p_id_actividad in actividad.id_actividad%TYPE,
+        p_nombre in actividad.nombre%type,
         p_descripcion in actividad.descripcion%type,
         p_estado in actividad.estado%type,
         p_fecha_inicio in actividad.fecha_inicio%type,
@@ -635,7 +695,7 @@ CREATE  OR REPLACE PACKAGE pkg_actividad AS
         p_cantidad_modificaciones in actividad.cantidad_modificaciones%type,
         p_id_profesional in actividad.id_profesional%type,
         p_id_cliente in actividad.id_cliente%type,
-        p_tipo_actividad in tipo_actividad.nombre%type,
+        p_id_tipo_actividad in actividad.id_tipo_actividad%type,
         p_actividad out tp_actividad
     );
 
@@ -655,13 +715,13 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
 
         ***************************************************************************************************************/
     BEGIN
-        SELECT id_actividad,a.nombre,descripcion,estado,fecha_inicio,resultado,cantidad_modificaciones,id_profesional,id_cliente,ta.nombre tipo_actividad
-        INTO p_actividad.id_actividad,p_actividad.nombre,p_actividad.descripcion,p_actividad.estado,p_actividad.fecha_inicio,p_actividad.resultado,p_actividad.cantidad_modificaciones,p_actividad.id_profesional,p_actividad.id_cliente,p_actividad.tipo_actividad
+        SELECT id_actividad,a.nombre,descripcion,estado,fecha_inicio,resultado,cantidad_modificaciones,id_profesional,id_cliente,id_tipo_actividad
+        INTO p_actividad.id_actividad,p_actividad.nombre,p_actividad.descripcion,p_actividad.estado,p_actividad.fecha_inicio,p_actividad.resultado,p_actividad.cantidad_modificaciones,p_actividad.id_profesional,p_actividad.id_cliente,p_actividad.id_tipo_actividad
         FROM actividad a join tipo_actividad ta USING(id_tipo_actividad)
         WHERE id_actividad = p_id_actividad;
     END;
 
-    PROCEDURE pr_obtener_actividad_profesional(p_id_profesional profesional.id_profesional%TYPE,p_actividad OUT tb_actividad) AS
+    PROCEDURE pr_obtener_actividad_profesional(p_id_profesional profesional.id_profesional%TYPE,p_cursor_actividad OUT c_actividad) AS
         /**************************************************************************************************************
            NAME:      pr_obtener_actividad_profesional
            PURPOSE		Obtiene datos de actividades de un profesional
@@ -672,21 +732,14 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
            1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
         ***************************************************************************************************************/
-        CURSOR act_cursor  IS
+    BEGIN
+        OPEN p_cursor_actividad FOR
             SELECT id_actividad,a.nombre,descripcion,estado,fecha_inicio,resultado,cantidad_modificaciones,id_profesional,id_cliente,ta.nombre
             FROM actividad a join tipo_actividad ta USING(id_tipo_actividad)
             WHERE id_profesional = p_id_profesional;
-
-    BEGIN
-        OPEN act_cursor;
-        LOOP
-            FETCH act_cursor BULK COLLECT INTO p_actividad;
-            EXIT WHEN act_cursor%NOTFOUND;
-        END LOOP;
-
     END;
 
-    PROCEDURE pr_obtener_actividad_cliente(p_id_cliente cliente.id_cliente%TYPE, p_actividad OUT tb_actividad) AS
+    PROCEDURE pr_obtener_actividad_cliente(p_id_cliente cliente.id_cliente%TYPE, p_cursor_actividad OUT c_actividad) AS
         /**************************************************************************************************************
            NAME:      pr_obtener_actividad_cliente
            PURPOSE		Obtiene actividades de un cliente
@@ -697,17 +750,11 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
            1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
         ***************************************************************************************************************/
-        CURSOR act_cursor  IS
+    BEGIN
+        OPEN p_cursor_actividad FOR
             SELECT id_actividad,a.nombre,descripcion,estado,fecha_inicio,resultado,cantidad_modificaciones,id_profesional,id_cliente,ta.nombre
             FROM actividad a join tipo_actividad ta USING(id_tipo_actividad)
             WHERE id_cliente = p_id_cliente;
-    BEGIN
-        OPEN act_cursor;
-        LOOP
-            FETCH act_cursor BULK COLLECT INTO p_actividad;
-            EXIT WHEN act_cursor%NOTFOUND;
-        END LOOP;
-
     END;
 
     PROCEDURE pr_insertar_actividad (
@@ -719,7 +766,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
         p_cantidad_modificaciones in actividad.cantidad_modificaciones%type,
         p_id_profesional in actividad.id_profesional%type,
         p_id_cliente in actividad.id_cliente%type,
-        p_tipo_actividad in tipo_actividad.nombre%type,
+        p_id_tipo_actividad in actividad.id_tipo_actividad%type,
         p_actividad out tp_actividad
     ) AS
         /**************************************************************************************************************
@@ -732,9 +779,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
            1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
         ***************************************************************************************************************/
-        v_id_tipo_actividad tipo_actividad.id_tipo_actividad%TYPE;
     BEGIN
-        SELECT id_tipo_actividad INTO v_id_tipo_actividad FROM tipo_actividad WHERE UPPER(nombre) LIKE UPPER(p_tipo_actividad);
         INSERT INTO actividad (id_actividad,
                                nombre,
                                descripcion,
@@ -754,7 +799,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
                p_cantidad_modificaciones,
                p_id_profesional,
                p_id_cliente,
-               v_id_tipo_actividad);
+               p_id_tipo_actividad);
         pr_obtener_actividad(id_actividad_seq.CURRVAL, p_actividad);
     END;
 
@@ -774,8 +819,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
     END;
 
     PROCEDURE pr_modificar_actividad(
-        p_id_actividad in actividad.id_actividad%TYPE
-            p_nombre in actividad.nombre%type,
+        p_id_actividad in actividad.id_actividad%TYPE,
+        p_nombre in actividad.nombre%type,
         p_descripcion in actividad.descripcion%type,
         p_estado in actividad.estado%type,
         p_fecha_inicio in actividad.fecha_inicio%type,
@@ -783,7 +828,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
         p_cantidad_modificaciones in actividad.cantidad_modificaciones%type,
         p_id_profesional in actividad.id_profesional%type,
         p_id_cliente in actividad.id_cliente%type,
-        p_tipo_actividad in tipo_actividad.nombre%type,
+        p_id_tipo_actividad in actividad.id_tipo_actividad%type,
         p_actividad out tp_actividad) AS
         /**************************************************************************************************************
            NAME:      pr_modificar_actividad
@@ -795,9 +840,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
            1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
         ***************************************************************************************************************/
-        v_id_tipo_actividad tipo_actividad.id_tipo_actividad%TYPE;
     BEGIN
-        SELECT id_tipo_actividad INTO v_id_tipo_actividad FROM tipo_actividad WHERE nombre LIKE p_tipo_actividad;
         UPDATE actividad
         SET nombre = p_nombre,
             descripcion = p_descripcion,
@@ -807,10 +850,65 @@ CREATE OR REPLACE PACKAGE BODY pkg_actividad AS
             cantidad_modificaciones = p_cantidad_modificaciones,
             id_profesional = p_id_profesional,
             id_cliente = p_id_cliente,
-            id_tipo_actividad = v_id_tipo_actividad
+            id_tipo_actividad = p_id_tipo_actividad
         WHERE id_actividad = p_id_actividad;
     END;
 END pkg_actividad;
+/
+
+CREATE OR REPLACE PACKAGE pkg_tipo_actividad AS
+    TYPE tp_tipo_actividad IS RECORD (
+        id_tipo_actividad NUMBER(38),
+        nombre            VARCHAR2(80)
+        );
+
+    TYPE tb_tipo_actividad IS TABLE OF tp_tipo_actividad;
+    TYPE c_tipo_actividad IS REF CURSOR RETURN tipo_actividad%ROWTYPE;
+
+
+    PROCEDURE pr_obtener_tipo_actividades(p_cursor_tipo_actividad OUT c_tipo_actividad);
+    PROCEDURE pr_obtener_tipo_actividad(p_id_tipo_actividad tipo_actividad.id_tipo_actividad%TYPE, p_tipo_actividad OUT tp_tipo_actividad);
+
+END pkg_tipo_actividad;
+/
+
+CREATE OR REPLACE PACKAGE BODY pkg_tipo_actividad AS
+
+    PROCEDURE pr_obtener_tipo_actividades(p_cursor_tipo_actividad OUT c_tipo_actividad) AS
+        /**************************************************************************************************************
+           NAME:      pr_obtener_tipo_actividades
+           PURPOSE		Obtiene todos los tipos de actividad en el sistema segun trabajador y devuelve tipo tabla tb_incidente
+
+           REVISIONS:
+           Ver          Date           Author                               Description
+           ---------    ----------     -------------------                  ----------------------------------------------
+           1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+        ***************************************************************************************************************/
+    BEGIN
+        OPEN p_cursor_tipo_actividad FOR
+            SELECT id_tipo_actividad, nombre
+            FROM tipo_actividad;
+    END;
+
+    PROCEDURE pr_obtener_tipo_actividad(p_id_tipo_actividad tipo_actividad.id_tipo_actividad%TYPE, p_tipo_actividad OUT tp_tipo_actividad) AS
+        /**************************************************************************************************************
+           NAME:      pr_obtener_tipo_actividades
+           PURPOSE		Obtiene tipo de actividad en el sistema segun su id
+
+           REVISIONS:
+           Ver          Date           Author                               Description
+           ---------    ----------     -------------------                  ----------------------------------------------
+           1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
+
+        ***************************************************************************************************************/
+    BEGIN
+        SELECT id_tipo_actividad, nombre
+        INTO p_tipo_actividad.id_tipo_actividad, p_tipo_actividad.nombre
+        FROM tipo_actividad
+        WHERE id_tipo_actividad = p_id_tipo_actividad;
+    END;
+END pkg_tipo_actividad;
 /
 
 CREATE OR REPLACE PACKAGE pkg_punto_mejorable AS
@@ -825,9 +923,10 @@ CREATE OR REPLACE PACKAGE pkg_punto_mejorable AS
         );
 
     TYPE tb_punto_mejorable IS TABLE OF tp_punto_mejorable;
+    TYPE c_punto_mejorable IS REF CURSOR RETURN punto_mejorable%ROWTYPE;
 
     PROCEDURE pr_obtener_punto_mejorable(p_id_punto_mejorable punto_mejorable.id_punto_mejorable%TYPE, p_punto_mejorable OUT tp_punto_mejorable);
-    PROCEDURE pr_obtener_punto_mejorable_activadad(p_id_actividad actividad.id_actividad%TYPE, p_punto_mejorable OUT tb_punto_mejorable);
+    PROCEDURE pr_obtener_punto_mejorable_activadad(p_id_actividad actividad.id_actividad%TYPE, p_cursor_punto_mejorable OUT c_punto_mejorable);
     PROCEDURE pr_insertar_punto_mejorable (
         p_titulo IN punto_mejorable.titulo%TYPE,
         p_descripcion IN punto_mejorable.descripcion%TYPE,
@@ -863,7 +962,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_punto_mejorable AS
         WHERE id_punto_mejorable = p_id_punto_mejorable;
     END;
 
-    PROCEDURE pr_obtener_punto_mejorable_activadad(p_id_actividad actividad.id_actividad%TYPE, p_punto_mejorable OUT tb_punto_mejorable) AS
+    PROCEDURE pr_obtener_punto_mejorable_activadad(p_id_actividad actividad.id_actividad%TYPE, p_cursor_punto_mejorable OUT c_punto_mejorable) AS
         /**************************************************************************************************************
            NAME:      pr_obtener_punto_mejorable_activadad
            PURPOSE	 Obtiene datos de punto mejorable por actividad
@@ -874,16 +973,11 @@ CREATE OR REPLACE PACKAGE BODY pkg_punto_mejorable AS
            1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
         ***************************************************************************************************************/
-        CURSOR act_cursor  IS
+    BEGIN
+        OPEN p_cursor_punto_mejorable FOR
             SELECT id_punto_mejorable,titulo,descripcion,cumplido,resultado,id_actividad
             FROM punto_mejorable
             WHERE id_actividad = p_id_actividad;
-    BEGIN
-        OPEN act_cursor;
-        LOOP
-            FETCH act_cursor BULK COLLECT INTO p_punto_mejorable;
-            EXIT WHEN act_cursor%NOTFOUND;
-        END LOOP;
 
     END;
 
@@ -964,12 +1058,20 @@ CREATE OR REPLACE PACKAGE pkg_plan AS
         );
 
     TYPE tb_plan IS TABLE OF tp_plan;
+    TYPE c_plan IS REF CURSOR RETURN plan%ROWTYPE;
 
     PROCEDURE pr_obtener_plan(p_id_plan plan.id_plan%TYPE, p_plan OUT tp_plan);
-    PROCEDURE pr_obtener_planes ( p_plan OUT tb_plan);
-    PROCEDURE pr_insertar_plan (p_plan IN OUT tp_plan);
+    PROCEDURE pr_obtener_planes ( p_cursor_plan OUT c_plan);
+    PROCEDURE pr_insertar_plan (
+        p_valor plan.valor%type,
+        p_descripcion plan.descripcion%type,
+        p_plan OUT tp_plan);
     PROCEDURE pr_eliminar_plan (p_id_plan plan.id_plan%TYPE);
-    PROCEDURE pr_modificar_plan (p_plan IN OUT tp_plan);
+    PROCEDURE pr_modificar_plan (
+        p_id_plan plan.id_plan%TYPE,
+        p_valor plan.valor%type,
+        p_descripcion plan.descripcion%type,
+        p_plan OUT tp_plan);
 
 END pkg_plan;
 /
@@ -993,7 +1095,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_plan AS
         WHERE id_plan = p_id_plan;
     END;
 
-    PROCEDURE pr_obtener_planes ( p_plan OUT tb_plan) AS
+    PROCEDURE pr_obtener_planes ( p_cursor_plan OUT c_plan) AS
         /**************************************************************************************************************
            NAME:      pr_obtener_planes
            PURPOSE		Obtiene datos de todos los olanas y devuelve una lista del tipo tp_plan
@@ -1004,19 +1106,17 @@ CREATE OR REPLACE PACKAGE BODY pkg_plan AS
            1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
         ***************************************************************************************************************/
-        CURSOR plan_cursor  IS
+    BEGIN
+        OPEN p_cursor_plan FOR
             SELECT id_plan,valor,descripcion
             FROM plan;
-    BEGIN
-        OPEN plan_cursor;
-        LOOP
-            FETCH plan_cursor BULK COLLECT INTO p_plan;
-            EXIT WHEN plan_cursor%NOTFOUND;
-        END LOOP;
     END;
 
 
-    PROCEDURE pr_insertar_plan (p_plan IN OUT tp_plan) AS
+    PROCEDURE pr_insertar_plan (
+        p_valor plan.valor%type,
+        p_descripcion plan.descripcion%type,
+        p_plan OUT tp_plan) AS
         /**************************************************************************************************************
            NAME:      pr_insertar_plan
            PURPOSE		Inserta datos de un plan y devuelve el tipo tp_plan
@@ -1029,7 +1129,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_plan AS
         ***************************************************************************************************************/
     BEGIN
         INSERT INTO plan (id_plan,valor,descripcion)
-        VALUES (id_plan_seq.NEXTVAL,p_plan.valor,p_plan.descripcion);
+        VALUES (id_plan_seq.NEXTVAL,p_valor,p_descripcion);
     END;
 
     PROCEDURE pr_eliminar_plan (p_id_plan plan.id_plan%TYPE) AS
@@ -1047,15 +1147,17 @@ CREATE OR REPLACE PACKAGE BODY pkg_plan AS
         DELETE FROM plan WHERE id_plan = p_id_plan;
     END;
 
-    PROCEDURE pr_modificar_plan (p_plan IN OUT tp_plan) AS
+    PROCEDURE pr_modificar_plan (
+        p_id_plan plan.id_plan%TYPE,
+        p_valor plan.valor%type,
+        p_descripcion plan.descripcion%type,
+        p_plan OUT tp_plan) AS
     BEGIN
         UPDATE plan
-        SET valor = p_plan.valor,
-            descripcion = p_plan.descripcion
+        SET valor = p_valor,
+            descripcion = p_descripcion
         WHERE id_plan = p_plan.id_plan;
     END;
-
-
 END pkg_plan;
 /
 
@@ -1063,9 +1165,9 @@ END pkg_plan;
 CREATE OR REPLACE PACKAGE pkg_contrato AS
     TYPE tp_contrato IS RECORD (
         id_contrato        NUMBER(38),
-        fecha_inicio       DATE,
-        fecha_termino      DATE,
-        fecha_facturacion  DATE,
+        fecha_inicio       NUMBER(38),
+        fecha_termino      NUMBER(38),
+        fecha_facturacion  NUMBER(38),
         id_cliente         NUMBER(38),
         id_plan            NUMBER(38)
         );
@@ -1073,9 +1175,22 @@ CREATE OR REPLACE PACKAGE pkg_contrato AS
     TYPE tb_contrato IS TABLE OF tp_contrato;
 
     PROCEDURE pr_obtener_contrato(p_id_cliente cliente.id_usuario%TYPE,p_contrato OUT tp_contrato);
-    PROCEDURE pr_insertar_contrato(p_contrato IN OUT tp_contrato);
+    PROCEDURE pr_insertar_contrato(
+        p_fecha_inicio contrato.fecha_inicio%TYPE,
+        p_fecha_termino contrato.fecha_termino%TYPE,
+        p_fecha_facturacion contrato.fecha_facturacion%TYPE,
+        p_id_cliente contrato.id_cliente%TYPE,
+        p_id_plan contrato.id_plan%TYPE,
+        p_contrato OUT tp_contrato);
     PROCEDURE pr_eliminar_contrato(p_id_cliente cliente.id_usuario%TYPE);
-    PROCEDURE pr_modificar_contrato(p_contrato IN OUT tp_contrato);
+    PROCEDURE pr_modificar_contrato(
+        p_id_contrato contrato.id_contrato%TYPE,
+        p_fecha_inicio contrato.fecha_inicio%TYPE,
+        p_fecha_termino contrato.fecha_termino%TYPE,
+        p_fecha_facturacion contrato.fecha_facturacion%TYPE,
+        p_id_cliente contrato.id_cliente%TYPE,
+        p_id_plan contrato.id_plan%TYPE,
+        p_contrato OUT tp_contrato);
 END pkg_contrato;
 /
 CREATE OR REPLACE PACKAGE BODY pkg_contrato AS
@@ -1095,10 +1210,16 @@ CREATE OR REPLACE PACKAGE BODY pkg_contrato AS
         SELECT id_contrato,fecha_inicio,fecha_termino,fecha_facturacion,id_cliente,id_plan
         INTO p_contrato.id_contrato,p_contrato.fecha_inicio,p_contrato.fecha_termino,p_contrato.fecha_facturacion,p_contrato.id_cliente,p_contrato.id_plan
         FROM contrato
-        WHERE p_id_cliente = p_id_cliente;
+        WHERE id_cliente = p_id_cliente;
     END;
 
-    PROCEDURE pr_insertar_contrato(p_contrato IN OUT tp_contrato) AS
+    PROCEDURE pr_insertar_contrato(
+        p_fecha_inicio contrato.fecha_inicio%TYPE,
+        p_fecha_termino contrato.fecha_termino%TYPE,
+        p_fecha_facturacion contrato.fecha_facturacion%TYPE,
+        p_id_cliente contrato.id_cliente%TYPE,
+        p_id_plan contrato.id_plan%TYPE,
+        p_contrato OUT tp_contrato) AS
         /**************************************************************************************************************
            NAME:      pr_insertar_contrato
            PURPOSE	  Inserta datos de contrato y devuelve tipos de tp_contrato
@@ -1129,15 +1250,22 @@ CREATE OR REPLACE PACKAGE BODY pkg_contrato AS
         DELETE FROM contrato WHERE id_cliente = p_id_cliente;
     END;
 
-    PROCEDURE pr_modificar_contrato(p_contrato IN OUT tp_contrato) AS
+    PROCEDURE pr_modificar_contrato(
+        p_id_contrato contrato.id_contrato%TYPE,
+        p_fecha_inicio contrato.fecha_inicio%TYPE,
+        p_fecha_termino contrato.fecha_termino%TYPE,
+        p_fecha_facturacion contrato.fecha_facturacion%TYPE,
+        p_id_cliente contrato.id_cliente%TYPE,
+        p_id_plan contrato.id_plan%TYPE,
+        p_contrato OUT tp_contrato) AS
     BEGIN
         UPDATE contrato
-        SET fecha_inicio = p_contrato.fecha_inicio,
-            fecha_termino = p_contrato.fecha_termino,
-            fecha_facturacion = p_contrato.fecha_facturacion,
-            id_cliente = p_contrato.id_cliente,
-            id_plan = p_contrato.id_plan
-        WHERE id_contrato = p_contrato.id_contrato;
+        SET fecha_inicio = p_fecha_inicio,
+            fecha_termino = p_fecha_termino,
+            fecha_facturacion = p_fecha_facturacion,
+            id_cliente = p_id_cliente,
+            id_plan = p_id_plan
+        WHERE id_contrato = p_id_contrato;
     END;
 END pkg_contrato;
 /
@@ -1154,14 +1282,29 @@ CREATE OR REPLACE PACKAGE pkg_trabajador AS
         );
 
     TYPE tb_trabajador IS TABLE OF tp_trabajador;
-
+    TYPE c_trabajador IS REF CURSOR RETURN trabajador%ROWTYPE;
     PROCEDURE pr_obtener_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p_trabajador OUT tp_trabajador) ;
-    PROCEDURE pr_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE, p_trabajador OUT tb_trabajador);
-    PROCEDURE pr_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE, p_trabajador OUT tb_trabajador);
-    PROCEDURE pr_insertar_trabajador(p_trabajador IN OUT tp_trabajador);
+    PROCEDURE pr_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE, p_cursor_trabajador OUT c_trabajador);
+    PROCEDURE pr_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE, p_cursor_trabajador OUT c_trabajador);
+    PROCEDURE pr_insertar_trabajador(
+        p_rut trabajador.rut%TYPE,
+        p_dv trabajador.dv%TYPE,
+        p_nombre trabajador.nombre%TYPE,
+        p_apellido_paterno trabajador.apellido_paterno%TYPE,
+        p_apellido_materno trabajador.apellido_materno%TYPE,
+        p_id_cliente trabajador.id_cliente%TYPE,
+        p_trabajador OUT tp_trabajador);
     PROCEDURE pr_insertar_trabajador_actividad(p_id_trabajador trabajador.id_trabajador%TYPE, p_id_actividad actividad.id_actividad%TYPE);
     PROCEDURE pr_eliminar_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE);
-    PROCEDURE pr_modificar_trabajador(p_trabajador IN OUT tp_trabajador);
+    PROCEDURE pr_modificar_trabajador(
+        p_id_trabajador trabajador.id_trabajador%TYPE,
+        p_rut trabajador.rut%TYPE,
+        p_dv trabajador.dv%TYPE,
+        p_nombre trabajador.nombre%TYPE,
+        p_apellido_paterno trabajador.apellido_paterno%TYPE,
+        p_apellido_materno trabajador.apellido_materno%TYPE,
+        p_id_cliente trabajador.id_cliente%TYPE,
+        p_trabajador OUT tp_trabajador);
 END pkg_trabajador;
 /
 CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
@@ -1184,7 +1327,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
         WHERE id_trabajador = p_id_trabajador;
     END;
 
-    PROCEDURE pr_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE, p_trabajador OUT tb_trabajador)  AS
+    PROCEDURE pr_obtener_trabajadores_actividad(p_id_actividad actividad.id_actividad%TYPE, p_cursor_trabajador OUT c_trabajador)  AS
         /**************************************************************************************************************
            NAME:      pr_obtener_trabajadores_actividad
            PURPOSE		Obtiene datos de trabajadores que asisten a una actividad, devuelve tipo tabla tb_trabajador
@@ -1195,19 +1338,14 @@ CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
            1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
         ***************************************************************************************************************/
-        CURSOR trabajador_cursor  IS
+    BEGIN
+        OPEN p_cursor_trabajador FOR
             SELECT id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente
             FROM trabajador join actividad_trabajador USING(id_trabajador)
             WHERE id_actividad = p_id_actividad;
-    BEGIN
-        OPEN trabajador_cursor;
-        LOOP
-            FETCH trabajador_cursor BULK COLLECT INTO p_trabajador;
-            EXIT WHEN trabajador_cursor%NOTFOUND;
-        END LOOP;
     END;
 
-    PROCEDURE pr_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE, p_trabajador OUT tb_trabajador)  AS
+    PROCEDURE pr_obtener_trabajador_cliente(p_id_cliente cliente.id_cliente%TYPE, p_cursor_trabajador OUT c_trabajador)  AS
         /**************************************************************************************************************
            NAME:      pr_obtener_trabajador_cliente
            PURPOSE		Obtiene datos de trabajadorres aosciados a un cliente, devuelve tipo tabla tb_trabajador
@@ -1218,19 +1356,21 @@ CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
            1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
         ***************************************************************************************************************/
-        CURSOR trabajador_cursor  IS
+    BEGIN
+        OPEN p_cursor_trabajador FOR
             SELECT id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente
             FROM trabajador
             WHERE id_cliente = p_id_cliente;
-    BEGIN
-        OPEN trabajador_cursor;
-        LOOP
-            FETCH trabajador_cursor BULK COLLECT INTO p_trabajador;
-            EXIT WHEN trabajador_cursor%NOTFOUND;
-        END LOOP;
     END;
 
-    PROCEDURE pr_insertar_trabajador(p_trabajador IN OUT tp_trabajador) AS
+    PROCEDURE pr_insertar_trabajador(
+        p_rut trabajador.rut%TYPE,
+        p_dv trabajador.dv%TYPE,
+        p_nombre trabajador.nombre%TYPE,
+        p_apellido_paterno trabajador.apellido_paterno%TYPE,
+        p_apellido_materno trabajador.apellido_materno%TYPE,
+        p_id_cliente trabajador.id_cliente%TYPE,
+        p_trabajador OUT tp_trabajador) AS
         /**************************************************************************************************************
            NAME:      pr_insertar_trabajador
            PURPOSE		Inserta datos de Trabajador y devuelve tipo tp_trabajador
@@ -1243,7 +1383,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
         ***************************************************************************************************************/
     BEGIN
         INSERT INTO trabajador (id_trabajador,rut,dv,nombre,apellido_paterno,apellido_materno,id_cliente)
-        VALUES (id_trabajador_seq.NEXTVAL,p_trabajador.rut,p_trabajador.dv,p_trabajador.nombre,p_trabajador.apellido_paterno,p_trabajador.apellido_materno,p_trabajador.id_cliente);
+        VALUES (id_trabajador_seq.NEXTVAL,p_rut,p_dv,p_nombre,p_apellido_paterno,p_apellido_materno,p_id_cliente);
     END;
 
     PROCEDURE pr_insertar_trabajador_actividad(p_id_trabajador trabajador.id_trabajador%TYPE, p_id_actividad actividad.id_actividad%TYPE) AS
@@ -1265,7 +1405,15 @@ CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
     BEGIN
         DELETE FROM trabajador WHERE id_trabajador = p_id_trabajador;
     END;
-    PROCEDURE pr_modificar_trabajador(p_trabajador IN OUT tp_trabajador) AS
+    PROCEDURE pr_modificar_trabajador(
+        p_id_trabajador trabajador.id_trabajador%TYPE,
+        p_rut trabajador.rut%TYPE,
+        p_dv trabajador.dv%TYPE,
+        p_nombre trabajador.nombre%TYPE,
+        p_apellido_paterno trabajador.apellido_paterno%TYPE,
+        p_apellido_materno trabajador.apellido_materno%TYPE,
+        p_id_cliente trabajador.id_cliente%TYPE,
+        p_trabajador OUT tp_trabajador) AS
         /**************************************************************************************************************
            NAME:      r_modificar_trabajador
            PURPOSE		Modifica datos de trabajador segun ID
@@ -1278,13 +1426,13 @@ CREATE OR REPLACE PACKAGE BODY pkg_trabajador AS
         ***************************************************************************************************************/
     BEGIN
         UPDATE trabajador
-        SET rut = p_trabajador.rut,
-            dv = p_trabajador.dv,
-            nombre = p_trabajador.nombre,
-            apellido_paterno = p_trabajador.apellido_paterno,
-            apellido_materno = p_trabajador.apellido_materno,
-            id_cliente = p_trabajador.id_cliente
-        WHERE id_trabajador = p_trabajador.id_trabajador;
+        SET rut = p_rut,
+            dv = p_dv,
+            nombre = p_nombre,
+            apellido_paterno = p_apellido_paterno,
+            apellido_materno = p_apellido_materno,
+            id_cliente = p_id_cliente
+        WHERE id_trabajador = p_id_trabajador;
     END;
 END pkg_trabajador;
 /
@@ -1293,18 +1441,27 @@ CREATE OR REPLACE PACKAGE pkg_incidente AS
 
     TYPE tp_incidente IS RECORD (
         id_incidente  NUMBER(38),
-        fecha         DATE,
+        fecha         NUMBER(38),
         descripcion   VARCHAR2(600)
         );
 
     TYPE tb_incidente IS TABLE OF tp_incidente;
+    TYPE c_incidente IS REF CURSOR RETURN incidente%ROWTYPE;
 
     PROCEDURE pr_obtener_incidente(p_id_incidente incidente.id_incidente%TYPE, p_incidente OUT tp_incidente);
-    PROCEDURE pr_obtener_incidente_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p_incidente OUT tb_incidente);
-    PROCEDURE pr_obtener_incidente_cliente(p_id_cliente cliente.id_cliente%TYPE, p_incidente OUT tb_incidente);
-    PROCEDURE pr_insertar_incidente(p_incidente IN OUT tp_incidente, p_id_trabajador trabajador.id_trabajador%TYPE);
+    PROCEDURE pr_obtener_incidente_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p_cursor_incidente OUT c_incidente);
+    PROCEDURE pr_obtener_incidente_cliente(p_id_cliente cliente.id_cliente%TYPE, p_cursor_incidente OUT c_incidente);
+    PROCEDURE pr_insertar_incidente(
+        p_fecha incidente.fecha%TYPE,
+        p_descripcion incidente.descripcion%TYPE,
+        p_incidente OUT tp_incidente,
+        p_id_trabajador trabajador.id_trabajador%TYPE);
     PROCEDURE pr_eliminar_incidente(p_id_incidente incidente.id_incidente%TYPE);
-    PROCEDURE pr_modificar_incidente(p_incidente IN OUT tp_incidente);
+    PROCEDURE pr_modificar_incidente(
+        p_id_incidente incidente.id_incidente%TYPE,
+        p_fecha incidente.fecha%TYPE,
+        p_descripcion incidente.descripcion%TYPE,
+        p_incidente OUT tp_incidente);
 
 
 END;
@@ -1328,7 +1485,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
         FROM incidente
         WHERE id_incidente = p_id_incidente;
     END;
-    PROCEDURE pr_obtener_incidente_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p_incidente OUT tb_incidente) AS
+    PROCEDURE pr_obtener_incidente_trabajador(p_id_trabajador trabajador.id_trabajador%TYPE, p_cursor_incidente OUT c_incidente) AS
         /**************************************************************************************************************
            NAME:      pr_obtener_incidente_trabajador
            PURPOSE		Obtiene todos los incidentes segun trabajador y devuelve tipo tabla tb_incidente
@@ -1339,18 +1496,14 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
            1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
         ***************************************************************************************************************/
-        CURSOR incidente_cursor IS
+
+    BEGIN
+        OPEN p_cursor_incidente FOR
             SELECT id_incidente, fecha, descripcion
             FROM incidente JOIN trabajador_incidente USING(id_incidente)
             WHERE id_trabajador = p_id_trabajador;
-    BEGIN
-        OPEN incidente_cursor;
-        LOOP
-            FETCH incidente_cursor BULK COLLECT INTO p_incidente;
-            EXIT WHEN incidente_cursor%NOTFOUND;
-        END LOOP;
     END;
-    PROCEDURE pr_obtener_incidente_cliente(p_id_cliente cliente.id_cliente%TYPE, p_incidente OUT tb_incidente) AS
+    PROCEDURE pr_obtener_incidente_cliente(p_id_cliente cliente.id_cliente%TYPE, p_cursor_incidente OUT c_incidente) AS
         /**************************************************************************************************************
            NAME:      pr_obtener_incidente_cliente
            PURPOSE		Obtiene todos los incidentes segun cliente y devuelve tipo tabla tb_incidente
@@ -1361,18 +1514,17 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
            1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
         ***************************************************************************************************************/
-        CURSOR incidente_cursor IS
+    BEGIN
+        OPEN p_cursor_incidente FOR
             SELECT id_incidente, fecha, descripcion
             FROM incidente JOIN trabajador_incidente USING(id_incidente) JOIN trabajador USING(id_trabajador)
             WHERE id_cliente = p_id_cliente;
-    BEGIN
-        OPEN incidente_cursor;
-        LOOP
-            FETCH incidente_cursor BULK COLLECT INTO p_incidente;
-            EXIT WHEN incidente_cursor%NOTFOUND;
-        END LOOP;
     END;
-    PROCEDURE pr_insertar_incidente(p_incidente IN OUT tp_incidente, p_id_trabajador trabajador.id_trabajador%TYPE) AS
+    PROCEDURE pr_insertar_incidente(
+        p_fecha incidente.fecha%TYPE,
+        p_descripcion incidente.descripcion%TYPE,
+        p_incidente OUT tp_incidente,
+        p_id_trabajador trabajador.id_trabajador%TYPE) AS
         /**************************************************************************************************************
            NAME:      pr_insertar_incidente
            PURPOSE	  Inserta datos de incidente y devuelve tipo tp_incidente
@@ -1385,7 +1537,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
         ***************************************************************************************************************/
     BEGIN
         INSERT INTO incidente (id_incidente, fecha, descripcion)
-        VALUES(id_incidente_seq.NEXTVAL, p_incidente.fecha, p_incidente.descripcion);
+        VALUES(id_incidente_seq.NEXTVAL, p_fecha, p_descripcion);
         INSERT INTO trabajador_incidente VALUES(p_id_trabajador, id_incidente_seq.CURRVAL);
     END;
     PROCEDURE pr_eliminar_incidente(p_id_incidente incidente.id_incidente%TYPE) AS
@@ -1402,7 +1554,11 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
     BEGIN
         DELETE FROM incidente WHERE id_incidente = p_id_incidente;
     END;
-    PROCEDURE pr_modificar_incidente(p_incidente IN OUT tp_incidente) AS
+    PROCEDURE pr_modificar_incidente(
+        p_id_incidente incidente.id_incidente%TYPE,
+        p_fecha incidente.fecha%TYPE,
+        p_descripcion incidente.descripcion%TYPE,
+        p_incidente OUT tp_incidente) AS
         /**************************************************************************************************************
            NAME:      pr_modificar_incidente
            PURPOSE	  Modifica datos de incidente
@@ -1415,11 +1571,10 @@ CREATE OR REPLACE PACKAGE BODY pkg_incidente AS
         ***************************************************************************************************************/
     BEGIN
         UPDATE incidente
-        SET fecha = p_incidente.fecha,
-            descripcion = p_incidente.descripcion
-        WHERE id_incidente = p_incidente.id_incidente;
+        SET fecha = p_fecha,
+            descripcion = p_descripcion
+        WHERE id_incidente = p_id_incidente;
     END;
-
 END;
 /
 
@@ -1428,17 +1583,21 @@ CREATE OR REPLACE PACKAGE pkg_notificacion AS
     TYPE tp_notificacion IS RECORD (
         id_notificacion  NUMBER(38),
         mensaje          VARCHAR2(1000),
-        hora             DATE,
+        hora             NUMBER(38),
         id_usuario       NUMBER(38)
         );
 
     TYPE tb_notificacion IS TABLE OF tp_notificacion;
+    TYPE c_notificacion IS REF CURSOR RETURN notificacion%ROWTYPE;
 
     PROCEDURE pr_obtener_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE, p_notificacion OUT tp_notificacion);
-    PROCEDURE pr_obtener_notificacion_usuario(p_id_usuario notificacion.id_usuario%TYPE,  p_notificacion OUT tb_notificacion) ;
-    PROCEDURE pr_insertar_notificacion(p_notificacion IN OUT tp_notificacion);
+    PROCEDURE pr_obtener_notificacion_usuario(p_id_usuario notificacion.id_usuario%TYPE,  p_cursor_notificacion OUT c_notificacion) ;
+    PROCEDURE pr_insertar_notificacion(
+        p_mensaje notificacion.mensaje%TYPE,
+        p_hora notificacion.hora%TYPE,
+        p_id_usuario notificacion.id_usuario%TYPE,
+        p_notificacion OUT tp_notificacion);
     PROCEDURE pr_eliminar_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE);
-
 END;
 /
 
@@ -1462,7 +1621,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_notificacion AS
         WHERE id_notificacion = p_id_notificacion;
     END;
 
-    PROCEDURE pr_obtener_notificacion_usuario(p_id_usuario notificacion.id_usuario%TYPE,  p_notificacion OUT tb_notificacion) AS
+    PROCEDURE pr_obtener_notificacion_usuario(p_id_usuario notificacion.id_usuario%TYPE,  p_cursor_notificacion OUT c_notificacion) AS
         /**************************************************************************************************************
            NAME:      pr_obtener_notificacion_usuario
            PURPOSE		Obtiene datos de notificacion segun su ID de usuario
@@ -1473,19 +1632,18 @@ CREATE OR REPLACE PACKAGE BODY pkg_notificacion AS
            1.1           04/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
         ***************************************************************************************************************/
-        CURSOR notificacion_cursor IS
+    BEGIN
+        OPEN p_cursor_notificacion FOR
             SELECT id_notificacion,mensaje,hora,id_usuario
             FROM notificacion
             WHERE id_usuario = p_id_usuario;
-    BEGIN
-        OPEN notificacion_cursor;
-        LOOP
-            FETCH notificacion_cursor BULK COLLECT INTO p_notificacion;
-            EXIT WHEN notificacion_cursor%NOTFOUND;
-        END LOOP;
     END;
 
-    PROCEDURE pr_insertar_notificacion(p_notificacion IN OUT tp_notificacion) AS
+    PROCEDURE pr_insertar_notificacion(
+        p_mensaje notificacion.mensaje%TYPE,
+        p_hora notificacion.hora%TYPE,
+        p_id_usuario notificacion.id_usuario%TYPE,
+        p_notificacion OUT tp_notificacion) AS
         /**************************************************************************************************************
            NAME:      pr_insertar_notificacion
            PURPOSE		Inserta datos de una notificacion
@@ -1501,7 +1659,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_notificacion AS
         VALUES (id_notificacion_seq.NEXTVAL,p_notificacion.mensaje,p_notificacion.hora,p_notificacion.id_usuario);
     END;
 
-    PROCEDURE pr_eliminar_notificacion(p_id_notificacion notificacion.id_notificacion%TYPE) AS
+    PROCEDURE pr_eliminar_notificacion(
+        p_id_notificacion notificacion.id_notificacion%TYPE) AS
         /**************************************************************************************************************
            NAME:      pr_eliminar_notificacion
            PURPOSE		Elimina datos de notificacion segun su ID
@@ -1517,6 +1676,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_notificacion AS
     END;
 END;
 /
+
+commit;
 
 /**************************************************************************************************************
    NAME:        DUMP_DATA
@@ -1572,12 +1733,10 @@ INSERT INTO TIPO_ACTIVIDAD VALUES(ID_TIPO_ACTIVIDAD_SEQ.NEXTVAL, 'Asesoria por m
 INSERT INTO TIPO_ACTIVIDAD VALUES(ID_TIPO_ACTIVIDAD_SEQ.NEXTVAL, 'Capacitacion');
 INSERT INTO TIPO_ACTIVIDAD VALUES(ID_TIPO_ACTIVIDAD_SEQ.NEXTVAL, 'Revision Documentacion');
 INSERT INTO TIPO_ACTIVIDAD VALUES(ID_TIPO_ACTIVIDAD_SEQ.NEXTVAL, 'Llamada telefonica');
+INSERT INTO TIPO_ACTIVIDAD VALUES(ID_TIPO_ACTIVIDAD_SEQ.NEXTVAL, 'Llamada especial');
 COMMIT;
 
 
 INSERT INTO ACTIVIDAD
-VALUES (id_actividad_seq.NEXTVAL,'Asesoria General', 'Asesoria General', 'A',TO_DATE('05/06/2020', 'dd/mm/yyyy'), 'Sin resultado aun', 0, 1, 1, 1);
+VALUES (id_actividad_seq.NEXTVAL,'Asesoria General', 'Asesoria General', 'A',0, 'Sin resultado aun', 0, 1, 1, 1);
 COMMIT;
-
-
-

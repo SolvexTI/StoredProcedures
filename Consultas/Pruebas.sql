@@ -72,9 +72,12 @@ BEGIN
 END;
 /
 
-  SELECT username,password,telefono,correo,id_profesional,nombre,apellido_paterno,apellido_materno,rut,dv
-    FROM usuario u JOIN profesional p USING(id_usuario);
 
 
 
-DESC USUARIO;   
+declare 
+    v_incidente pkg_incidente.tp_incidente;
+begin
+    PKG_INCIDENTE.PR_INSERTAR_INCIDENTE(111,'1',2, v_incidente);
+end;
+/

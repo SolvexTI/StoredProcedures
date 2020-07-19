@@ -93,7 +93,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
       NULL;
   END;
 
-  PROCEDURE pr_obtener_profesionales(p_profesional OUT tb_profesional) AS
+  PROCEDURE pr_obtener_profesionales(p_cursor_profesional OUT c_profesional) AS
   /**************************************************************************************************************
      NAME:      pr_obtener_profesionales
      PURPOSE		Lista datos de todos los profesionales junto con los datos de usuario
@@ -104,10 +104,6 @@ CREATE OR REPLACE PACKAGE BODY pkg_profesional AS
      1.1           14/06/2020     Alejandro Del Pino       		       	1. Creación Procedimiento
 
   ***************************************************************************************************************/
-    CURSOR profesional_cursor  IS
-    SELECT id_usuario,username,password,telefono,correo,id_profesional,nombre,apellido_paterno,apellido_materno,rut,dv
-    FROM usuario u JOIN profesional p USING(id_usuario);
-
   BEGIN
 
     OPEN p_cursor_profesional FOR
